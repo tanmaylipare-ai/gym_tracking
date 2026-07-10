@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { WorkoutService } from '../../core/services/workout.service';
 import { WorkoutSummaryDto } from '../../core/models/models';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-history',
@@ -38,7 +39,8 @@ import { WorkoutSummaryDto } from '../../core/models/models';
         <!-- Workout list -->
         <div class="space-y-3">
           @for (w of workouts(); track w.id) {
-            <div class="card rounded-2xl p-4">
+            <div
+  class="card rounded-2xl p-4 cursor-pointer transition-transform active:scale-[0.98]"role="button" tabindex="0"(click)="openWorkout(w.id)"(keydown.enter)="openWorkout(w.id)">
               <div class="flex items-start justify-between">
                 <div>
                   <p class="font-bold">{{ w.name }}</p>
@@ -52,6 +54,19 @@ import { WorkoutSummaryDto } from '../../core/models/models';
                         : 'bg-gym-muted/15 text-gym-muted'">
                   {{ w.status }}
                 </span>
+                  <svg
+                    class="w-5 h-5 text-gym-muted"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
               </div>
 
               <!-- Stats row -->
@@ -88,6 +103,7 @@ import { WorkoutSummaryDto } from '../../core/models/models';
 })
 export class HistoryComponent implements OnInit {
   private workoutService = inject(WorkoutService);
+  private router = inject(Router);
 
   readonly workouts    = signal<WorkoutSummaryDto[]>([]);
   readonly loading     = signal(true);
@@ -95,6 +111,9 @@ export class HistoryComponent implements OnInit {
   readonly hasMore     = signal(false);
 
   private page = 1;
+  openWorkout(id: string): void {
+    this.router.navigate(['/history', id]);
+  }
 
   ngOnInit(): void {
     this.workoutService.getHistory(1, 20).subscribe({

@@ -69,7 +69,7 @@ export interface WorkoutDto {
   routineId?: string;
   status: 'InProgress' | 'Completed' | 'Cancelled';
   startedAt: string;
-  finishedAt?: string;
+  finishedAt: string | null;
   notes?: string;
   exercises: WorkoutExerciseDto[];
   createdAt: string;

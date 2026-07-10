@@ -35,6 +35,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/history/history.component').then(m => m.HistoryComponent)
       },
       {
+        path: 'history/:id',
+        loadComponent: () => import('./features/history/workout-detail.component').then(m => m.WorkoutDetailComponent)
+      },
+      {
         path: 'profile',
         loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
       }
