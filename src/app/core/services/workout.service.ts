@@ -3,8 +3,10 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { WorkoutDto, WorkoutSummaryDto, PaginatedResponse } from '../models/models';
 import { StorageService } from './storage.service';
+import { environment } from '../../../environments/environment';
 
-const API = 'http://localhost:5000/api/workouts';
+// const API = 'http://localhost:5000/api/workouts';
+const API = `${environment.apiUrl}/api/auth`;
 
 export interface SyncPayload {
   workoutId: string;

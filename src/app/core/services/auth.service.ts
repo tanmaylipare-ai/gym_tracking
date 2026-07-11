@@ -4,8 +4,10 @@ import { Router } from '@angular/router';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { AuthResponse, MessageResponse, UserProfileDto } from '../models/models';
 import { StorageService } from './storage.service';
+import { environment } from '../../../environments/environment';
 
-const API = 'http://localhost:5000/api/auth';
+// const API = 'http://localhost:5000/api/auth';
+const API = `${environment.apiUrl}/api/auth`;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

@@ -2,8 +2,10 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ExerciseDto } from '../models/models';
+import { environment } from '../../../environments/environment';
 
-const API = 'http://localhost:5000/api/exercises';
+// const API = 'http://localhost:5000/api/exercises';
+const API = `${environment.apiUrl}/api/auth`;
 
 @Injectable({ providedIn: 'root' })
 export class ExerciseService {
