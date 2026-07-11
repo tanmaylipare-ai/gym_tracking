@@ -62,7 +62,9 @@ import { AuthService } from '../../core/services/auth.service';
                 </svg>
               }
             </button>
+            <br><br>
           </div>
+          <a routerLink="/forgot-password" class="text-xs text-gym-accent font-medium">Forgot password?</a>          
           @if (form.get('password')?.invalid && form.get('password')?.touched) {
             <p class="text-gym-accent text-xs mt-1.5">Password is required.</p>
           }

@@ -2,7 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError, throwError } from 'rxjs';
-import { AuthResponse, UserProfileDto } from '../models/models';
+import { AuthResponse, MessageResponse, UserProfileDto } from '../models/models';
 import { StorageService } from './storage.service';
 
 const API = 'http://localhost:5000/api/auth';
@@ -58,6 +58,18 @@ export class AuthService {
         this.storage.setUserProfile(user);
       })
     );
+  }
+
+    // ── Forgot password ───────────────────────────────────────────────────────────
+ 
+  forgotPassword(email: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${API}/forgot-password`, { email });
+  }
+ 
+  // ── Reset password ────────────────────────────────────────────────────────────
+ 
+  resetPassword(token: string, newPassword: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${API}/reset-password`, { token, newPassword });
   }
 
   // ── Logout ────────────────────────────────────────────────────────────────────

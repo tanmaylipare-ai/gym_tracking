@@ -2,6 +2,16 @@ import { Routes } from '@angular/router';
 import { authGuard, noAuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
+    {
+    path: 'forgot-password',
+    loadComponent: () => import('./features/auth/forgot-password.component').then(m => m.ForgotPasswordComponent),
+    canActivate: [noAuthGuard]
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./features/auth/reset-password.component').then(m => m.ResetPasswordComponent),
+    canActivate: [noAuthGuard]
+  },
   {
     path: 'login',
     loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent),

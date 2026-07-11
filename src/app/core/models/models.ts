@@ -99,3 +99,36 @@ export interface ApiError {
   message: string;
   errors?: Record<string, string[]>;
 }
+
+export interface MessageResponse {
+  message: string;
+}
+ 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+ 
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+ 
+// ── Sync request shapes (must match backend SyncWorkoutRequest exactly) ────────
+ 
+export interface SyncSetDto {
+  id: string | null;        // nullable uuid — null for client-created sets not yet persisted
+  setNumber: number;
+  reps: number;
+  weight: number;
+  weightUnit: string;
+  isCompleted: boolean;
+  completedAt: string | null;
+}
+ 
+export interface SyncExerciseDto {
+  id: string | null;        // nullable uuid — null for client-created exercises
+  exerciseId: string;
+  order: number;
+  notes: string | null;
+  sets: SyncSetDto[];
+}
