@@ -138,7 +138,7 @@ import { ExercisePickerComponent } from './exercise-picker.component';
 
       <!-- Cancel confirm modal -->
       @if (showCancelConfirm()) {
-        <div class="fixed inset-0 z-50 bg-black/60 flex items-end px-4 pb-8 safe-bottom" (click)="showCancelConfirm.set(false)">
+        <div class="fixed inset-0 z-50 bg-black/60 flex items-center px-4 pb-8 safe-bottom" (click)="showCancelConfirm.set(false)">
           <div class="w-full card rounded-2xl p-5 space-y-3" (click)="$event.stopPropagation()">
             <h3 class="font-bold text-lg">Cancel workout?</h3>
             <p class="text-gym-muted text-sm">This workout will be deleted and cannot be recovered.</p>
@@ -154,7 +154,7 @@ import { ExercisePickerComponent } from './exercise-picker.component';
 
       <!-- Finish confirm modal -->
       @if (showFinishConfirm()) {
-        <div class="fixed inset-0 z-50 bg-black/60 flex items-end px-4 pb-8 safe-bottom" (click)="showFinishConfirm.set(false)">
+        <div class="fixed inset-0 z-50 bg-black/60 flex items-center px-4 pb-8 safe-bottom" (click)="showFinishConfirm.set(false)">
           <div class="w-full card rounded-2xl p-5 space-y-3" (click)="$event.stopPropagation()">
             <h3 class="font-bold text-lg">Finish workout?</h3>
             <p class="text-gym-muted text-sm">

@@ -5,7 +5,7 @@ import { RoutineDto } from '../models/models';
 import { environment } from '../../../environments/environment';
 
 // const API = 'http://localhost:5000/api/routines';
-const API = `${environment.apiUrl}/api/auth`;
+const API = `${environment.apiUrl}/api/routines`;
 
 export interface CreateRoutinePayload {
   name: string;

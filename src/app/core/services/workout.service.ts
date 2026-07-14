@@ -6,7 +6,7 @@ import { StorageService } from './storage.service';
 import { environment } from '../../../environments/environment';
 
 // const API = 'http://localhost:5000/api/workouts';
-const API = `${environment.apiUrl}/api/auth`;
+const API = `${environment.apiUrl}/api/workouts`;
 
 export interface SyncPayload {
   workoutId: string;

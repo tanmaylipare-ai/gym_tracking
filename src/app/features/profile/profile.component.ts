@@ -83,7 +83,7 @@ import { WorkoutService } from '../../core/services/workout.service';
 
       <!-- Logout confirm modal -->
       @if (showLogoutConfirm()) {
-        <div class="fixed inset-0 z-50 bg-black/60 flex items-end px-4 pb-8 safe-bottom" (click)="showLogoutConfirm.set(false)">
+        <div class="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4" (click)="showLogoutConfirm.set(false)">
           <div class="w-full card rounded-2xl p-5 space-y-3" (click)="$event.stopPropagation()">
             <h3 class="font-bold text-lg">Sign out?</h3>
             <p class="text-gym-muted text-sm">You'll need to sign back in to access your workouts.</p>

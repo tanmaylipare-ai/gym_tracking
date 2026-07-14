@@ -86,8 +86,8 @@ import { RoutineDto, ExerciseDto } from '../../core/models/models';
 
     <!-- Create routine modal -->
     @if (showModal()) {
-      <div class="fixed inset-0 z-50 bg-black/60 flex items-end px-4 pb-6 safe-bottom" (click)="showModal.set(false)">
-        <div class="w-full card rounded-2xl p-5 space-y-4 max-h-[80vh] overflow-y-auto"
+      <div class="fixed inset-0 z-50 bg-black/60 flex items-center px-4 pb-6" (click)="showModal.set(false)">
+        <div class="w-full max-w-md card rounded-2xl p-5 space-y-4 max-h-[80vh] overflow-y-auto"
              (click)="$event.stopPropagation()">
           <h2 class="font-bold text-xl">New Routine</h2>
 

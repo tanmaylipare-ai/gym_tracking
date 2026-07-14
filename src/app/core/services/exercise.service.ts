@@ -5,7 +5,7 @@ import { ExerciseDto } from '../models/models';
 import { environment } from '../../../environments/environment';
 
 // const API = 'http://localhost:5000/api/exercises';
-const API = `${environment.apiUrl}/api/auth`;
+const API = `${environment.apiUrl}/api/exercises`;
 
 @Injectable({ providedIn: 'root' })
 export class ExerciseService {

@@ -19,8 +19,9 @@ interface NavTab {
         @for (tab of tabs; track tab.path) {
           <a
             [routerLink]="tab.path"
-            routerLinkActive="text-gym-accent"
-            [routerLinkActiveOptions]="{ exact: tab.path === '/workout' ? false : true }"
+            routerLinkActive="!text-gym-accent"
+            [routerLinkActiveOptions]="{exact: !['/workout', '/history'].includes(tab.path)
+            }"
             class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gym-muted transition-colors active:scale-95"
           >
             <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
