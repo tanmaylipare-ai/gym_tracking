@@ -17,6 +17,7 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="min-h-screen bg-gym-bg flex flex-col justify-center px-6 safe-top safe-bottom">
+      <div class="w-full max-w-md mx-auto">
 
       <div class="mb-10 text-center">
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gym-accent mb-4">
@@ -100,6 +101,7 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
           <a routerLink="/login" class="text-gym-accent font-medium">Back to sign in</a>
         </p>
       }
+    </div> <!-- max width container -->
     </div>
   `
 })

@@ -10,6 +10,7 @@ import { AuthService } from '../../core/services/auth.service';
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="min-h-screen bg-gym-bg flex flex-col justify-center px-6 safe-top safe-bottom">
+      <div class="w-full max-w-md mx-auto">
 
       <!-- Logo / brand -->
       <div class="mb-10 text-center">
@@ -96,6 +97,7 @@ import { AuthService } from '../../core/services/auth.service';
         No account?
         <a routerLink="/register" class="text-gym-accent font-medium ml-1">Create one</a>
       </p>
+      </div> <!-- max-width container -->
     </div>
   `
 })

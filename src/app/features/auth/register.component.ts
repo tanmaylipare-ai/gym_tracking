@@ -17,6 +17,7 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="min-h-screen bg-gym-bg flex flex-col justify-center px-6 safe-top safe-bottom">
+      <div class="w-full max-w-md mx-auto">
 
       <!-- Brand -->
       <div class="mb-8 text-center">
@@ -92,6 +93,7 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
         Already have an account?
         <a routerLink="/login" class="text-gym-accent font-medium ml-1">Sign in</a>
       </p>
+      </div> <!-- max-width container -->
     </div>
   `
 })

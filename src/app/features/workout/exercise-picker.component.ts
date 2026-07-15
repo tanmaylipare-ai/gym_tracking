@@ -9,7 +9,8 @@ import { ExerciseDto } from '../../core/models/models';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="fixed inset-0 z-50 flex flex-col bg-gym-bg safe-top safe-bottom">
+    <div class="fixed inset-0 z-50 flex justify-center bg-gym-bg">
+      <div class="w-full max-w-md flex flex-col bg-gym-bg safe-top safe-bottom">
 
       <!-- Header -->
       <div class="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-gym-border">
@@ -102,6 +103,7 @@ import { ExerciseDto } from '../../core/models/models';
             </button>
           }
         }
+      </div>
       </div>
     </div>
   `
