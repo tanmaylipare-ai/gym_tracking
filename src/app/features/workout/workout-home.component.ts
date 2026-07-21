@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { WorkoutService } from '../../core/services/workout.service';
 import { RoutineService } from '../../core/services/routine.service';
@@ -9,7 +9,7 @@ import { RoutineDto } from '../../core/models/models';
 
 @Component({
     selector: 'app-workout-home',
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule],
     template: `
     <div class="px-4 pt-6 pb-4 safe-top">
 

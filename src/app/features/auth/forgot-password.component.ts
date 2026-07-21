@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
     selector: 'app-forgot-password',
-    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink],
     template: `
     <div class="min-h-screen bg-gym-bg flex flex-col justify-center px-6 safe-top safe-bottom">
       <div class="w-full max-w-md mx-auto">

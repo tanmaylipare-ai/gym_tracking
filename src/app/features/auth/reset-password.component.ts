@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { AuthService } from '../../core/services/auth.service';
 
 function passwordMatch(control: AbstractControl): ValidationErrors | null {
@@ -13,7 +13,7 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
 
 @Component({
     selector: 'app-reset-password',
-    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink],
     template: `
     <div class="min-h-screen bg-gym-bg flex flex-col justify-center px-6 safe-top safe-bottom">
       <div class="w-full max-w-md mx-auto">

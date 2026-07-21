@@ -1,5 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { RoutineService, CreateRoutinePayload } from '../../core/services/routine.service';
 import { ExerciseService } from '../../core/services/exercise.service';
@@ -7,7 +7,7 @@ import { RoutineDto, ExerciseDto } from '../../core/models/models';
 
 @Component({
     selector: 'app-routines',
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule],
     template: `
     <div class="px-4 pt-6 pb-4 safe-top">
 

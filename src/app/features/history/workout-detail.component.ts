@@ -5,10 +5,7 @@ import {
   signal
 } from '@angular/core';
 
-import {
-  CommonModule,
-  DatePipe
-} from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 
 import {
   ActivatedRoute,
