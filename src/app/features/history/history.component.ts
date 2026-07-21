@@ -5,10 +5,9 @@ import { WorkoutSummaryDto } from '../../core/models/models';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-history',
-  standalone: true,
-  imports: [CommonModule, DatePipe],
-  template: `
+    selector: 'app-history',
+    imports: [CommonModule, DatePipe],
+    template: `
     <div class="px-4 pt-6 pb-4 safe-top">
 
       <!-- Header -->

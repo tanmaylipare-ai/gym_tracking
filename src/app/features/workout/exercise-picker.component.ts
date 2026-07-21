@@ -5,10 +5,9 @@ import { ExerciseService } from '../../core/services/exercise.service';
 import { ExerciseDto } from '../../core/models/models';
 
 @Component({
-  selector: 'app-exercise-picker',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
+    selector: 'app-exercise-picker',
+    imports: [CommonModule, FormsModule],
+    template: `
     <div class="fixed inset-0 z-50 flex justify-center bg-gym-bg">
       <div class="w-full max-w-md flex flex-col bg-gym-bg safe-top safe-bottom">
 

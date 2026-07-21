@@ -10,10 +10,9 @@ interface NavTab {
 }
 
 @Component({
-  selector: 'app-bottom-nav',
-  standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
-  template: `
+    selector: 'app-bottom-nav',
+    imports: [CommonModule, RouterLink, RouterLinkActive],
+    template: `
     <nav class="fixed bottom-0 left-0 right-0 bg-gym-card border-t border-gym-border safe-bottom z-50">
       <div class="w-full max-w-5xl mx-auto flex items-stretch h-16">
         @for (tab of tabs; track tab.path) {

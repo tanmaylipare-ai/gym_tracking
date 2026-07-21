@@ -19,13 +19,12 @@ import { WorkoutService } from '../../core/services/workout.service';
 import { WorkoutDto } from '../../core/models/models';
 
 @Component({
-  selector: 'app-workout-detail',
-  standalone: true,
-  imports: [
-    CommonModule,
-    DatePipe
-  ],
-  template: `
+    selector: 'app-workout-detail',
+    imports: [
+        CommonModule,
+        DatePipe
+    ],
+    template: `
     <div class="px-4 pt-6 pb-8 safe-top">
 
       <!-- Header -->

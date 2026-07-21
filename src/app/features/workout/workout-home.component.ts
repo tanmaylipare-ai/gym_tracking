@@ -8,10 +8,9 @@ import { AuthService } from '../../core/services/auth.service';
 import { RoutineDto } from '../../core/models/models';
 
 @Component({
-  selector: 'app-workout-home',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
+    selector: 'app-workout-home',
+    imports: [CommonModule, FormsModule],
+    template: `
     <div class="px-4 pt-6 pb-4 safe-top">
 
       <!-- Greeting -->

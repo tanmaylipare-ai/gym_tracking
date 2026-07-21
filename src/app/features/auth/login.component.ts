@@ -5,10 +5,9 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  template: `
+    selector: 'app-login',
+    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    template: `
     <div class="min-h-screen bg-gym-bg flex flex-col justify-center px-6 safe-top safe-bottom">
       <div class="w-full max-w-md mx-auto">
 

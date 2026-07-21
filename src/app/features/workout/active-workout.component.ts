@@ -7,10 +7,9 @@ import { WorkoutDto, WorkoutExerciseDto, WorkoutSetDto, ExerciseDto } from '../.
 import { ExercisePickerComponent } from './exercise-picker.component';
 
 @Component({
-  selector: 'app-active-workout',
-  standalone: true,
-  imports: [CommonModule, FormsModule, ExercisePickerComponent],
-  template: `
+    selector: 'app-active-workout',
+    imports: [CommonModule, FormsModule, ExercisePickerComponent],
+    template: `
     <div class="flex flex-col min-h-screen bg-gym-bg pb-24 safe-top">
 
       <!-- Sticky header -->

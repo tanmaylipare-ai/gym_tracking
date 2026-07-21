@@ -6,10 +6,9 @@ import { ExerciseService } from '../../core/services/exercise.service';
 import { RoutineDto, ExerciseDto } from '../../core/models/models';
 
 @Component({
-  selector: 'app-routines',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
+    selector: 'app-routines',
+    imports: [CommonModule, FormsModule],
+    template: `
     <div class="px-4 pt-6 pb-4 safe-top">
 
       <!-- Header -->

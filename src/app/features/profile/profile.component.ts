@@ -4,10 +4,9 @@ import { AuthService } from '../../core/services/auth.service';
 import { WorkoutService } from '../../core/services/workout.service';
 
 @Component({
-  selector: 'app-profile',
-  standalone: true,
-  imports: [CommonModule, DatePipe],
-  template: `
+    selector: 'app-profile',
+    imports: [CommonModule, DatePipe],
+    template: `
     <div class="px-4 pt-6 pb-8 safe-top">
 
       <!-- Header -->
