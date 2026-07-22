@@ -1,29 +1,45 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { ExerciseDto } from '../models/models';
+import { Observable, of, shareReplay, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-
-// const API = 'http://localhost:5000/api/exercises';
-const API = `${environment.apiUrl}/api/exercises`;
+import { ExerciseDto } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class ExerciseService {
   private http = inject(HttpClient);
+  private readonly baseUrl = `${environment.apiUrl}/api/exercises`;
+
+  private exercises$?: Observable<ExerciseDto[]>;
+  private readonly exerciseCache = new Map<string, ExerciseDto>();
 
   getAll(): Observable<ExerciseDto[]> {
-    return this.http.get<ExerciseDto[]>(API);
+    if (!this.exercises$) {
+      this.exercises$ = this.http.get<ExerciseDto[]>(this.baseUrl).pipe(
+        tap(list => list.forEach(e => this.exerciseCache.set(e.id, e))),
+        shareReplay(1)
+      );
+    }
+    return this.exercises$;
   }
 
-  create(payload: { name: string; category: string; muscleGroup: string; description?: string }): Observable<ExerciseDto> {
-    return this.http.post<ExerciseDto>(API, payload);
+  getById(id: string): Observable<ExerciseDto> {
+    const cached = this.exerciseCache.get(id);
+    if (cached) {
+      return of(cached);
+    }
+    return this.http.get<ExerciseDto>(`${this.baseUrl}/${id}`).pipe(
+      tap(e => this.exerciseCache.set(e.id, e))
+    );
   }
 
-  update(id: string, payload: Partial<ExerciseDto>): Observable<ExerciseDto> {
-    return this.http.put<ExerciseDto>(`${API}/${id}`, payload);
+  /** Prepend the API origin to a relative media path returned by the backend */
+  mediaUrl(path: string | null): string | null {
+    return path ? `${environment.apiUrl}${path}` : null;
   }
 
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${API}/${id}`);
+  /** Call after creating/editing a custom exercise so the next getAll() re-fetches */
+  invalidateCache(): void {
+    this.exercises$ = undefined;
+    this.exerciseCache.clear();
   }
 }

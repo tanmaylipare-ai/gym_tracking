@@ -12,14 +12,28 @@ export interface AuthResponse {
   user: UserProfileDto;
 }
 
+// export interface ExerciseDto {
+//   id: string;
+//   name: string;
+//   category: string;
+//   muscleGroup: string;
+//   description?: string;
+//   isCustom: boolean;
+//   createdAt: string;
+// }
+
 export interface ExerciseDto {
   id: string;
   name: string;
   category: string;
   muscleGroup: string;
-  description?: string;
+  secondaryMuscleGroup: string | null;
+  equipment: string;
+  description: string | null;
   isCustom: boolean;
   createdAt: string;
+  thumbnailUrl: string | null;
+  videoUrl: string | null;
 }
 
 export interface RoutineExerciseDto {

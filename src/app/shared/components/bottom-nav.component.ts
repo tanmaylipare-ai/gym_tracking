@@ -19,7 +19,7 @@ interface NavTab {
           <a
             [routerLink]="tab.path"
             routerLinkActive="!text-gym-accent"
-            [routerLinkActiveOptions]="{exact: !['/workout', '/history'].includes(tab.path)
+            [routerLinkActiveOptions]="{exact: !['/workout', '/history','/exercises'].includes(tab.path)
             }"
             class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gym-muted transition-colors active:scale-95"
           >
@@ -41,6 +41,12 @@ export class BottomNavComponent {
       path: '/workout',
       icon: 'M3 6h3m15 0h-3M3 12h18M6 6v12M18 6v12M9 18h6',
       activeIcon: 'M3 6h3m15 0h-3M3 12h18M6 6v12M18 6v12M9 18h6'
+    },
+    {
+      label: 'Exercises',
+      path: '/exercises',
+      icon: 'M4 12h16M4 8v8M8 6v12M16 6v12M20 8v8',
+      activeIcon: 'M4 12h16M4 8v8M8 6v12M16 6v12M20 8v8'
     },
     {
       label: 'Routines',

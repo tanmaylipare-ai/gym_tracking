@@ -41,6 +41,14 @@ export const routes: Routes = [
         loadComponent: () => import('./features/routines/routines.component').then(m => m.RoutinesComponent)
       },
       {
+        path: 'exercises',
+        loadComponent: () => import('./features/exercises/exercise-list.component').then(m => m.ExerciseListComponent)
+      },
+      {
+        path: 'exercises/:id',
+        loadComponent: () => import('./features/exercises/exercise-detail.component').then(m => m.ExerciseDetailComponent)
+      },
+      {
         path: 'history',
         loadComponent: () => import('./features/history/history.component').then(m => m.HistoryComponent)
       },
