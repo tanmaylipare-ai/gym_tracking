@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { RoutineService, CreateRoutinePayload } from '../../core/services/routine.service';
 import { ExerciseService } from '../../core/services/exercise.service';
 import { RoutineDto, ExerciseDto } from '../../core/models/models';
+import { ExercisePickerComponent } from '../workout/exercise-picker.component';
 
 @Component({
     selector: 'app-routines',
-    imports: [FormsModule],
+    imports: [FormsModule, ExercisePickerComponent],
     template: `
     <div class="px-4 pt-6 pb-4 safe-top">
 
@@ -102,20 +103,31 @@ import { RoutineDto, ExerciseDto } from '../../core/models/models';
 
           <div>
             <label class="block text-sm text-gym-muted mb-3">Exercises</label>
-            @if (loadingExercises()) {
-              <p class="text-gym-muted text-sm">Loading exercises…</p>
-            } @else {
-              <div class="max-h-52 overflow-y-auto space-y-2 pr-1">
-                @for (ex of allExercises(); track ex.id) {
-                  <label class="flex items-center gap-3 p-3 bg-gym-surface rounded-xl cursor-pointer">
-                    <input type="checkbox" [value]="ex.id"
-                           (change)="toggleExercise(ex, $event)"
-                           class="w-4 h-4 accent-gym-accent"/>
+
+            <button
+              type="button"
+              class="btn-secondary w-full"
+              (click)="showExercisePicker.set(true)">
+              Add Exercises
+            </button>
+
+            @if (selectedExercises().length) {
+              <div class="mt-3 space-y-2">
+                @for (ex of selectedExercises(); track ex.id) {
+                  <div class="flex items-center justify-between bg-gym-surface rounded-xl p-3">
                     <div>
-                      <p class="text-sm font-medium">{{ ex.name }}</p>
-                      <p class="text-xs text-gym-muted">{{ ex.category }}</p>
+                      <p class="font-medium text-sm">{{ ex.name }}</p>
+                      <p class="text-xs text-gym-muted">
+                        {{ ex.category }} · {{ ex.muscleGroup }}
+                      </p>
                     </div>
-                  </label>
+
+                    <button
+                      (click)="removeExercise(ex.id)"
+                      class="text-gym-muted hover:text-gym-accent">
+                      ✕
+                    </button>
+                  </div>
                 }
               </div>
             }
@@ -132,23 +144,28 @@ import { RoutineDto, ExerciseDto } from '../../core/models/models';
         </div>
       </div>
     }
+    <!-- Exercise picker -->
+    @if (showExercisePicker()) {
+      <app-exercise-picker
+        (close)="showExercisePicker.set(false)"
+        (selected$)="onExercisesSelected($event)">
+      </app-exercise-picker>
+    }
   `
 })
 export class RoutinesComponent implements OnInit {
   private routineService  = inject(RoutineService);
-  private exerciseService = inject(ExerciseService);
 
   readonly routines         = signal<RoutineDto[]>([]);
-  readonly allExercises     = signal<ExerciseDto[]>([]);
   readonly loading          = signal(true);
-  readonly loadingExercises = signal(true);
   readonly showModal        = signal(false);
   readonly creating         = signal(false);
   readonly createError      = signal('');
 
   newName        = '';
   newDescription = '';
-  selectedExercises: ExerciseDto[] = [];
+  readonly showExercisePicker = signal(false);
+  readonly selectedExercises = signal<ExerciseDto[]>([]);
 
   ngOnInit(): void {
     this.routineService.getAll().subscribe({
@@ -160,26 +177,21 @@ export class RoutinesComponent implements OnInit {
   openCreate(): void {
     this.newName = '';
     this.newDescription = '';
-    this.selectedExercises = [];
+    this.selectedExercises.set([]);
     this.createError.set('');
     this.showModal.set(true);
-
-    if (this.allExercises().length === 0) {
-      this.exerciseService.getAll().subscribe({
-        next: (e) => { this.allExercises.set(e); this.loadingExercises.set(false); },
-        error: () => this.loadingExercises.set(false),
-      });
-    }
   }
+  
+onExercisesSelected(exercises: ExerciseDto[]) {
+  this.selectedExercises.set(exercises);
+  this.showExercisePicker.set(false);
+}
 
-  toggleExercise(ex: ExerciseDto, event: Event): void {
-    const checked = (event.target as HTMLInputElement).checked;
-    if (checked) {
-      this.selectedExercises = [...this.selectedExercises, ex];
-    } else {
-      this.selectedExercises = this.selectedExercises.filter(e => e.id !== ex.id);
-    }
-  }
+removeExercise(id: string) {
+  this.selectedExercises.update(list =>
+    list.filter(e => e.id !== id)
+  );
+}
 
   createRoutine(): void {
     if (!this.newName.trim()) return;
@@ -189,7 +201,7 @@ export class RoutinesComponent implements OnInit {
     const payload: CreateRoutinePayload = {
       name:        this.newName.trim(),
       description: this.newDescription.trim() || undefined,
-      exercises:   this.selectedExercises.map((ex, i) => ({
+      exercises:   this.selectedExercises().map((ex, i) => ({
         exerciseId:    ex.id,
         order:         i,
         defaultSets:   3,

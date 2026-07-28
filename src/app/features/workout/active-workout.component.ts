@@ -152,6 +152,15 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                   </svg>
                 </button>
+
+                <!-- Delete set -->
+                <button (click)="removeSet(exIdx, setIdx)"
+                        class="flex items-center justify-center w-6 h-6 text-gym-muted"
+                        aria-label="Remove set">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
               </div>
             }
 
@@ -290,11 +299,11 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
 
   gridTemplateColumns(type: ExerciseType): string {
     switch (type) {
-      case 'WeightTraining': return '2rem 1fr 4.5rem 4.5rem 2.5rem';
-      case 'Bodyweight':     return '2rem 1fr 4.5rem 2.5rem';
-      case 'Cardio':         return '2rem 1fr 5rem 5rem 2.5rem';
-      case 'BandTraining':   return '2rem 1fr 5.5rem 4.5rem 2.5rem';
-      default:               return '2rem 1fr 4.5rem 4.5rem 2.5rem';
+      case 'WeightTraining': return '2rem 1fr 4.5rem 4.5rem 2.5rem 2rem';
+      case 'Bodyweight':     return '2rem 1fr 4.5rem 2.5rem 2rem';
+      case 'Cardio':         return '2rem 1fr 5rem 5rem 2.5rem 2rem';
+      case 'BandTraining':   return '2rem 1fr 5.5rem 4.5rem 2.5rem 2rem';
+      default:               return '2rem 1fr 4.5rem 4.5rem 2.5rem 2rem';
     }
   }
 
@@ -359,6 +368,19 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
     ex.sets.push(newSet);
     this.workoutService.updateLocalWorkout(updated);
   }
+
+  removeSet(exIdx: number, setIdx: number): void {
+  const w = this.workout();
+  if (!w) return;
+  console.log("Remove set triggered Frontend")
+  const updated: WorkoutDto = JSON.parse(JSON.stringify(w));
+  const ex = updated.exercises[exIdx];
+
+  ex.sets.splice(setIdx, 1);
+  ex.sets.forEach((s, i) => s.setNumber = i + 1);
+
+  this.workoutService.updateLocalWorkout(updated);
+}
 
   removeExercise(exIdx: number): void {
     const w = this.workout();

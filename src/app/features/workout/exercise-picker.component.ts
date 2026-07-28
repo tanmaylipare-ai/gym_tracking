@@ -33,12 +33,13 @@ import { ExerciseDto } from '../../core/models/models';
           <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gym-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
           </svg>
-          <input
-            [(ngModel)]="searchQuery"
-            type="text"
-            placeholder="Search exercises…"
-            class="input-field pl-10"
-          />
+            <input
+              [ngModel]="searchQuery()"
+              (ngModelChange)="searchQuery.set($event)"
+              type="text"
+              placeholder="Search exercises…"
+              class="input-field pl-10"
+            />
         </div>
       </div>
 
@@ -117,18 +118,22 @@ export class ExercisePickerComponent implements OnInit {
   readonly exercises     = signal<ExerciseDto[]>([]);
   readonly selected      = signal<ExerciseDto[]>([]);
   readonly activeCategory = signal('');
-  searchQuery = '';
+  // searchQuery = '';
+  readonly searchQuery = signal('');
 
   readonly categories = computed(() =>
     [...new Set(this.exercises().map(e => e.category))].sort()
   );
 
   readonly filtered = computed(() => {
-    const q   = this.searchQuery.toLowerCase();
+    const q = this.searchQuery().toLowerCase();
     const cat = this.activeCategory();
+
     return this.exercises().filter(e =>
       (!cat || e.category === cat) &&
-      (!q   || e.name.toLowerCase().includes(q) || e.muscleGroup.toLowerCase().includes(q))
+      (!q ||
+        e.name.toLowerCase().includes(q) ||
+        e.muscleGroup.toLowerCase().includes(q))
     );
   });
 
