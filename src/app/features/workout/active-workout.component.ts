@@ -3,8 +3,10 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WorkoutService } from '../../core/services/workout.service';
-import { WorkoutDto, WorkoutExerciseDto, WorkoutSetDto, ExerciseDto } from '../../core/models/models';
+import { WorkoutDto, WorkoutExerciseDto, WorkoutSetDto, ExerciseDto, ExerciseType } from '../../core/models/models';
 import { ExercisePickerComponent } from './exercise-picker.component';
+
+const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
 
 @Component({
     selector: 'app-active-workout',
@@ -52,45 +54,94 @@ import { ExercisePickerComponent } from './exercise-picker.component';
               </button>
             </div>
 
-            <!-- Set column headers -->
-            <div class="grid grid-cols-[2rem_1fr_4.5rem_4.5rem_2.5rem] gap-2 px-4 py-2 text-[10px] font-bold text-gym-muted uppercase tracking-wider">
+            <!-- Set column headers (per exercise type) -->
+            <div class="grid gap-2 px-4 py-2 text-[10px] font-bold text-gym-muted uppercase tracking-wider"
+                [style.grid-template-columns]="gridTemplateColumns(ex.exerciseType)">
               <span class="text-center">SET</span>
-              <span>PREVIOUS</span>
-              <span class="text-center">KG</span>
-              <span class="text-center">REPS</span>
+              @for (header of columnHeaders(ex.exerciseType); track header) {
+                <span [class.text-center]="header !== 'PREVIOUS'">{{ header }}</span>
+              }
               <span></span>
             </div>
 
             <!-- Set rows -->
             @for (set of ex.sets; track set.id; let setIdx = $index) {
-              <div class="grid grid-cols-[2rem_1fr_4.5rem_4.5rem_2.5rem] gap-2 items-center px-4 py-2 transition-colors"
-                   [ngClass]="{'bg-gym-success/10': set.isCompleted}">
+            <div class="grid gap-2 items-center px-4 py-2 transition-colors"
+                [style.grid-template-columns]="gridTemplateColumns(ex.exerciseType)"
+                [class.bg-gym-success/10]="set.isCompleted">
+
                 <!-- Set number -->
                 <span class="text-center text-sm font-bold"
                       [class.text-gym-success]="set.isCompleted"
                       [class.text-gym-muted]="!set.isCompleted">
                   {{ set.setNumber }}
                 </span>
-                <!-- Previous (placeholder for now) -->
+
+                <!-- Previous (placeholder) -->
                 <span class="text-xs text-gym-muted truncate">—</span>
-                <!-- Weight input -->
-                <input
-                  type="number"
-                  [(ngModel)]="set.weight"
-                  (ngModelChange)="onSetChanged(exIdx, setIdx)"
-                  min="0"
-                  class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
-                  [class.border-gym-success]="set.isCompleted"
-                />
-                <!-- Reps input -->
-                <input
-                  type="number"
-                  [(ngModel)]="set.reps"
-                  (ngModelChange)="onSetChanged(exIdx, setIdx)"
-                  min="0"
-                  class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
-                  [class.border-gym-success]="set.isCompleted"
-                />
+
+                @switch (ex.exerciseType) {
+
+                  @case ('WeightTraining') {
+                    <input
+                      type="number" [(ngModel)]="set.weight" (ngModelChange)="onSetChanged(exIdx, setIdx)"
+                      min="0" placeholder="kg"
+                      class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
+                      [class.border-gym-success]="set.isCompleted"
+                    />
+                    <input
+                      type="number" [(ngModel)]="set.reps" (ngModelChange)="onSetChanged(exIdx, setIdx)"
+                      min="0" placeholder="reps"
+                      class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
+                      [class.border-gym-success]="set.isCompleted"
+                    />
+                  }
+
+                  @case ('Bodyweight') {
+                    <input
+                      type="number" [(ngModel)]="set.reps" (ngModelChange)="onSetChanged(exIdx, setIdx)"
+                      min="0" placeholder="reps"
+                      class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
+                      [class.border-gym-success]="set.isCompleted"
+                    />
+                  }
+
+                  @case ('Cardio') {
+                    <input
+                      type="text" inputmode="numeric" [value]="formatDuration(set.durationSeconds)"
+                      (change)="onDurationChanged(exIdx, setIdx, $event)"
+                      placeholder="mm:ss"
+                      class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
+                      [class.border-gym-success]="set.isCompleted"
+                    />
+                    <input
+                      type="number" [(ngModel)]="set.distance" (ngModelChange)="onSetChanged(exIdx, setIdx)"
+                      min="0" step="0.1" placeholder="km"
+                      class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
+                      [class.border-gym-success]="set.isCompleted"
+                    />
+                  }
+
+                  @case ('BandTraining') {
+                    <select
+                      [(ngModel)]="set.bandLevel" (ngModelChange)="onSetChanged(exIdx, setIdx)"
+                      class="w-full text-center text-xs font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
+                      [class.border-gym-success]="set.isCompleted"
+                    >
+                      @for (level of bandLevels; track level) {
+                        <option [value]="level">{{ level }}</option>
+                      }
+                    </select>
+                    <input
+                      type="number" [(ngModel)]="set.reps" (ngModelChange)="onSetChanged(exIdx, setIdx)"
+                      min="0" placeholder="reps"
+                      class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
+                      [class.border-gym-success]="set.isCompleted"
+                    />
+                  }
+
+                }
+
                 <!-- Complete toggle -->
                 <button (click)="toggleSetComplete(exIdx, setIdx)"
                         class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors"
@@ -187,6 +238,8 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
   readonly showCancelConfirm = signal(false);
   readonly showFinishConfirm = signal(false);
 
+  readonly bandLevels = BAND_LEVELS;
+
   finishNotes = '';
 
   private startTime = Date.now();
@@ -218,7 +271,6 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
       this.router.navigate(['/workout']);
       return;
     }
-    // Compute initial elapsed from workout startedAt
     const started = this.workout()?.startedAt;
     if (started) this.startTime = new Date(started).getTime();
 
@@ -226,7 +278,6 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
       this.elapsedSecs.set(Math.floor((Date.now() - this.startTime) / 1000));
     }, 1000);
 
-    // Auto-sync every 30 seconds
     this.syncTimer = setInterval(() => this.autoSync(), 30_000);
   }
 
@@ -235,10 +286,55 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
     clearInterval(this.syncTimer);
   }
 
+  // ── Per-type layout helpers ───────────────────────────────────────────────────
+
+  gridTemplateColumns(type: ExerciseType): string {
+    switch (type) {
+      case 'WeightTraining': return '2rem 1fr 4.5rem 4.5rem 2.5rem';
+      case 'Bodyweight':     return '2rem 1fr 4.5rem 2.5rem';
+      case 'Cardio':         return '2rem 1fr 5rem 5rem 2.5rem';
+      case 'BandTraining':   return '2rem 1fr 5.5rem 4.5rem 2.5rem';
+      default:               return '2rem 1fr 4.5rem 4.5rem 2.5rem';
+    }
+  }
+
+  columnHeaders(type: ExerciseType): string[] {
+    switch (type) {
+      case 'WeightTraining': return ['PREVIOUS', 'KG', 'REPS'];
+      case 'Bodyweight':     return ['PREVIOUS', 'REPS'];
+      case 'Cardio':         return ['PREVIOUS', 'TIME', 'KM'];
+      case 'BandTraining':   return ['PREVIOUS', 'BAND', 'REPS'];
+    }
+  }
+
+  formatDuration(totalSeconds: number | null): string {
+    const s = totalSeconds ?? 0;
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${String(sec).padStart(2, '0')}`;
+  }
+
+  private parseDuration(value: string): number {
+    const trimmed = value.trim();
+    if (trimmed.includes(':')) {
+      const [m, s] = trimmed.split(':').map(n => parseInt(n, 10) || 0);
+      return m * 60 + s;
+    }
+    return parseInt(trimmed, 10) || 0;
+  }
+
+  onDurationChanged(exIdx: number, setIdx: number, event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    const w = this.workout();
+    if (!w) return;
+    const updated: WorkoutDto = JSON.parse(JSON.stringify(w));
+    updated.exercises[exIdx].sets[setIdx].durationSeconds = this.parseDuration(value);
+    this.workoutService.updateLocalWorkout(updated);
+  }
+
   // ── Set operations ────────────────────────────────────────────────────────────
 
   onSetChanged(_exIdx: number, _setIdx: number): void {
-    // Debounce handled by 30s sync timer; immediate local update already done via ngModel
     const w = this.workout();
     if (w) this.workoutService.updateLocalWorkout({ ...w });
   }
@@ -259,14 +355,7 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
     const updated: WorkoutDto = JSON.parse(JSON.stringify(w));
     const ex = updated.exercises[exIdx];
     const lastSet = ex.sets[ex.sets.length - 1];
-    const newSet: WorkoutSetDto = {
-      id:          crypto.randomUUID(),
-      setNumber:   ex.sets.length + 1,
-      reps:        lastSet?.reps ?? 8,
-      weight:      lastSet?.weight ?? 0,
-      weightUnit:  'kg',
-      isCompleted: false,
-    };
+    const newSet = this.buildSet(ex.exerciseType, ex.sets.length + 1, lastSet);
     ex.sets.push(newSet);
     this.workoutService.updateLocalWorkout(updated);
   }
@@ -278,6 +367,36 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
     updated.exercises.splice(exIdx, 1);
     this.workoutService.updateLocalWorkout(updated);
   }
+
+  /** Builds a new set for the given exercise type, carrying over the previous set's values as a starting point. */
+  private buildSet(type: ExerciseType, setNumber: number, previous?: WorkoutSetDto): WorkoutSetDto {
+    const base: WorkoutSetDto = {
+      id: crypto.randomUUID(),
+      setNumber,
+      reps: null,
+      weight: null,
+      weightUnit: null,
+      durationSeconds: null,
+      distance: null,
+      distanceUnit: null,
+      bandLevel: null,
+      isCompleted: false,
+    };
+
+    switch (type) {
+      case 'WeightTraining':
+        return { ...base, reps: previous?.reps ?? 8, weight: previous?.weight ?? 0, weightUnit: 'kg' };
+      case 'Bodyweight':
+        return { ...base, reps: previous?.reps ?? 8 };
+      case 'Cardio':
+        return { ...base, durationSeconds: previous?.durationSeconds ?? 60, distance: previous?.distance ?? null, distanceUnit: 'km' };
+      case 'BandTraining':
+        return { ...base, reps: previous?.reps ?? 8, bandLevel: previous?.bandLevel ?? 'Medium' };
+      default:
+        console.warn(`Unknown exercise type "${type}", defaulting to WeightTraining set shape.`);
+        return { ...base, reps: previous?.reps ?? 8, weight: previous?.weight ?? 0, weightUnit: 'kg' };
+    }
+}
 
   // ── Exercise picker ───────────────────────────────────────────────────────────
 
@@ -291,19 +410,13 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
 
     exercises.forEach((ex, i) => {
       updated.exercises.push({
-        id:              crypto.randomUUID(),
-        exerciseId:      ex.id,
-        exerciseName:    ex.name,
+        id:               crypto.randomUUID(),
+        exerciseId:       ex.id,
+        exerciseName:     ex.name,
         exerciseCategory: ex.category,
-        order:           nextOrder + i,
-        sets: [{
-          id:          crypto.randomUUID(),
-          setNumber:   1,
-          reps:        8,
-          weight:      0,
-          weightUnit:  'kg',
-          isCompleted: false,
-        }]
+        exerciseType:     ex.exerciseType,
+        order:            nextOrder + i,
+        sets: [this.buildSet(ex.exerciseType, 1)]
       });
     });
     this.workoutService.updateLocalWorkout(updated);
@@ -318,7 +431,6 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
   finishWorkout(): void {
     const w = this.workout();
     if (!w) return;
-    // Final sync then finish
     this.workoutService.sync(w.id, w).subscribe({
       next: () => {
         this.workoutService.finish(w.id, this.finishNotes || undefined).subscribe({
@@ -327,7 +439,6 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
         });
       },
       error: () => {
-        // Try to finish anyway even if sync fails
         this.workoutService.finish(w.id, this.finishNotes || undefined).subscribe({
           next: () => this.router.navigate(['/history']),
           error: () => this.router.navigate(['/history']),

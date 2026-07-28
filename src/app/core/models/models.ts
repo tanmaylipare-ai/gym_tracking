@@ -22,6 +22,8 @@ export interface AuthResponse {
 //   createdAt: string;
 // }
 
+export type ExerciseType = 'WeightTraining' | 'Bodyweight' | 'Cardio' | 'BandTraining';
+
 export interface ExerciseDto {
   id: string;
   name: string;
@@ -31,6 +33,7 @@ export interface ExerciseDto {
   equipment: string;
   description: string | null;
   isCustom: boolean;
+  exerciseType: ExerciseType;  
   createdAt: string;
   thumbnailUrl: string | null;
   videoUrl: string | null;
@@ -60,9 +63,13 @@ export interface RoutineDto {
 export interface WorkoutSetDto {
   id: string;
   setNumber: number;
-  reps: number;
-  weight: number;
-  weightUnit: string;
+  reps: number | null;
+  weight: number | null;
+  weightUnit: string | null;
+  durationSeconds: number | null;
+  distance: number | null;
+  distanceUnit: string | null;
+  bandLevel: string | null;
   isCompleted: boolean;
   completedAt?: string;
 }
@@ -72,6 +79,7 @@ export interface WorkoutExerciseDto {
   exerciseId: string;
   exerciseName: string;
   exerciseCategory: string;
+  exerciseType: ExerciseType;
   order: number;
   notes?: string;
   sets: WorkoutSetDto[];
@@ -132,9 +140,13 @@ export interface ResetPasswordRequest {
 export interface SyncSetDto {
   id: string | null;        // nullable uuid — null for client-created sets not yet persisted
   setNumber: number;
-  reps: number;
-  weight: number;
-  weightUnit: string;
+  reps: number | null;
+  weight: number | null;
+  weightUnit: string | null;
+  durationSeconds: number | null;
+  distance: number | null;
+  distanceUnit: string | null;
+  bandLevel: string | null;
   isCompleted: boolean;
   completedAt: string | null;
 }
