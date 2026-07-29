@@ -6,17 +6,20 @@ import { WorkoutService } from '../../core/services/workout.service';
 import { RoutineService } from '../../core/services/routine.service';
 import { AuthService } from '../../core/services/auth.service';
 import { RoutineDto } from '../../core/models/models';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
     selector: 'app-workout-home',
-    imports: [FormsModule],
+    imports: [FormsModule,TitleCasePipe],
     template: `
     <div class="px-4 pt-6 pb-4 safe-top">
 
       <!-- Greeting -->
       <div class="mb-6">
         <p class="text-gym-muted text-sm">{{ greeting() }}</p>
-        <h1 class="text-2xl font-bold mt-0.5">{{ user()?.name ?? 'Athlete' }}</h1>
+        <h1 class="text-2xl font-bold mt-0.5">
+          {{ (user()?.name ?? 'Athlete') | titlecase }}
+        </h1>
       </div>
 
       <!-- Resume active workout banner -->
