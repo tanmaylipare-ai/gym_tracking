@@ -38,7 +38,7 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
           <input type="text" formControlName="name" placeholder="Your name"
                  autocomplete="name" class="input-field"/>
           @if (form.get('name')?.invalid && form.get('name')?.touched) {
-            <p class="text-gym-accent text-xs mt-1.5">Name is required.</p>
+            <p class="text-red-500 text-xs mt-1.5">Name is required.</p>
           }
         </div>
 
@@ -47,7 +47,7 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
           <input type="email" formControlName="email" placeholder="you@example.com"
                  autocomplete="email" class="input-field"/>
           @if (form.get('email')?.invalid && form.get('email')?.touched) {
-            <p class="text-gym-accent text-xs mt-1.5">Enter a valid email address.</p>
+            <p class="text-red-500 text-xs mt-1.5">Enter a valid email address.</p>
           }
         </div>
 
@@ -56,7 +56,7 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
           <input type="password" formControlName="password" placeholder="Min. 8 characters"
                  autocomplete="new-password" class="input-field"/>
           @if (form.get('password')?.invalid && form.get('password')?.touched) {
-            <p class="text-gym-accent text-xs mt-1.5">Password must be at least 8 characters.</p>
+            <p class="text-red-500 text-xs mt-1.5">Password must be at least 8 characters.</p>
           }
         </div>
 
@@ -65,13 +65,13 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
           <input type="password" formControlName="confirmPassword" placeholder="Repeat password"
                  autocomplete="new-password" class="input-field"/>
           @if (form.errors?.['mismatch'] && form.get('confirmPassword')?.touched) {
-            <p class="text-gym-accent text-xs mt-1.5">Passwords do not match.</p>
+            <p class="text-red-500 text-xs mt-1.5">Passwords do not match.</p>
           }
         </div>
 
         @if (error()) {
-          <div class="bg-gym-accent/10 border border-gym-accent/30 rounded-xl px-4 py-3">
-            <p class="text-gym-accent text-sm">{{ error() }}</p>
+          <div class="bg-gym-accent/10 border border-red-500 rounded-xl px-4 py-3">
+            <p class="text-red-500 text-sm">{{ error() }}</p>
           </div>
         }
 

@@ -14,7 +14,7 @@ interface CategoryFilter {
     imports: [CommonModule],
     template: `
     <div class="px-4 pt-6 pb-4 safe-top">
-      <h1 class="text-2xl font-bold mb-4">Exercises</h1>
+      <h1 class="text-2xl p-2 font-bold mb-4">Exercises</h1>
 
       <!-- Search -->
       <div class="relative mb-3">
@@ -35,8 +35,8 @@ interface CategoryFilter {
             (click)="selectCategory(cat.value)"
             class="shrink-0 text-xs font-semibold px-3.5 py-1.5 rounded-full transition-colors"
             [ngClass]="activeCategory() === cat.value
-              ? 'bg-gym-accent text-white'
-              : 'bg-gym-surface text-gym-muted'"
+              ? 'bg-gym-accent text-gym-bg'
+              : 'bg-gym-surface text-gym-fg'"
           >
             {{ cat.label }}
           </button>
@@ -90,8 +90,8 @@ interface CategoryFilter {
               </div>
 
               <div class="min-w-0 flex-1">
-                <p class="text-sm font-semibold truncate">{{ ex.name }}</p>
-                <p class="text-[11px] text-gym-muted mt-0.5">{{ ex.muscleGroup }} · {{ ex.equipment }}</p>
+                <p class="text-sm text-gym-fg font-semibold truncate">{{ ex.name }}</p>
+                <p class="text-[11px] text-gym-fg mt-0.5">{{ ex.muscleGroup }} · {{ ex.equipment }}</p>
               </div>
 
               <span class="text-[10px] font-semibold px-2 py-1 rounded-full bg-gym-accent/15 text-gym-accent shrink-0">

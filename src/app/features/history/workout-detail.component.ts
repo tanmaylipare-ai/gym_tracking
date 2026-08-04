@@ -25,7 +25,7 @@ import { WorkoutDto } from '../../core/models/models';
     <div class="px-4 pt-6 pb-8 safe-top">
 
       <!-- Header -->
-      <div class="flex items-center gap-3 mb-6">
+      <div class="flex items-center pt-2 pl-1 gap-3 mb-6">
 
         <button
           type="button"
@@ -113,8 +113,8 @@ import { WorkoutDto } from '../../core/models/models';
           class="text-[11px] font-semibold px-2.5 py-1 rounded-full"
           [ngClass]="
             w.status === 'Completed'
-              ? 'bg-gym-success/15 text-gym-success'
-              : 'bg-gym-muted/15 text-gym-muted'
+              ? 'bg-gym-surface text-gym-success'
+              : 'bg-gym-surface text-gym-muted'
           "
         >
           {{ w.status }}

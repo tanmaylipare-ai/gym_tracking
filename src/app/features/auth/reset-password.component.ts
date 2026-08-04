@@ -64,14 +64,14 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
             <input type="password" formControlName="confirmPassword" placeholder="Repeat password"
                    autocomplete="new-password" class="input-field"/>
             @if (form.errors?.['mismatch'] && form.get('confirmPassword')?.touched) {
-              <p class="text-gym-accent text-xs mt-1.5">Passwords do not match.</p>
+              <p class="text-red-500 text-xs mt-1.5">Passwords do not match.</p>
             }
           </div>
 
           <!-- Token invalid / expired error -->
           @if (error()) {
             <div class="bg-gym-accent/10 border border-gym-accent/30 rounded-xl px-4 py-3">
-              <p class="text-gym-accent text-sm">{{ error() }}</p>
+              <p class="text-red-500 text-sm">{{ error() }}</p>
               @if (showRequestNewLink()) {
                 <a routerLink="/forgot-password"
                    class="text-gym-accent font-semibold text-sm underline mt-2 block">

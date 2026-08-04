@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
     <div class="px-4 pt-6 pb-4 safe-top">
 
       <!-- Header -->
-      <h1 class="text-2xl font-bold mb-6">History</h1>
+      <h1 class="text-2xl pt-2 pl-2 font-bold mb-6">History</h1>
 
       <!-- Loading skeleton -->
       @if (loading()) {
@@ -42,15 +42,15 @@ import { Router } from '@angular/router';
   class="card rounded-2xl p-4 cursor-pointer transition-transform active:scale-[0.98]"role="button" tabindex="0"(click)="openWorkout(w.id)"(keydown.enter)="openWorkout(w.id)">
               <div class="flex items-start justify-between">
                 <div>
-                  <p class="font-bold">{{ w.name }}</p>
+                  <p class="font-bold text-gym-fr">{{ w.name }}</p>
                   <p class="text-xs text-gym-muted mt-1">
                     {{ w.startedAt | date:'EEE, MMM d · h:mm a' }}
                   </p>
                 </div>
                 <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full"
                       [ngClass]="w.status === 'Completed'
-                        ? 'bg-gym-success/15 text-gym-success'
-                        : 'bg-gym-muted/15 text-gym-muted'">
+                        ? 'bg-gym-surface text-gym-success'
+                        : 'bg-gym-surface text-gym-muted'">
                   {{ w.status }}
                 </span>
                   <svg

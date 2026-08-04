@@ -34,13 +34,13 @@ import { AuthService } from '../../core/services/auth.service';
             <input type="email" formControlName="email" placeholder="you@example.com"
                    autocomplete="email" class="input-field"/>
             @if (form.get('email')?.invalid && form.get('email')?.touched) {
-              <p class="text-gym-accent text-xs mt-1.5">Enter a valid email address.</p>
+              <p class="text-red-500 text-xs mt-1.5">Enter a valid email address.</p>
             }
           </div>
 
           @if (error()) {
             <div class="bg-gym-accent/10 border border-gym-accent/30 rounded-xl px-4 py-3">
-              <p class="text-gym-accent text-sm">{{ error() }}</p>
+              <p class="text-red-500 text-sm">{{ error() }}</p>
             </div>
           }
 

@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { WorkoutService } from '../../core/services/workout.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
     selector: 'app-profile',
@@ -10,7 +11,7 @@ import { WorkoutService } from '../../core/services/workout.service';
     <div class="px-4 pt-6 pb-8 safe-top">
 
       <!-- Header -->
-      <h1 class="text-2xl font-bold mb-6">Profile</h1>
+      <h1 class="text-2xl px-1 pt-2 font-bold mb-6">Profile</h1>
 
       <!-- Avatar + name -->
       <div class="card rounded-2xl p-5 mb-4">
@@ -51,6 +52,39 @@ import { WorkoutService } from '../../core/services/workout.service';
 
       <!-- Settings rows -->
       <div class="card rounded-2xl mb-4 divide-y divide-gym-border">
+
+        <!-- Appearance / theme -->
+        <div class="flex items-center justify-between px-5 py-4">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-gym-muted" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <span class="text-sm font-medium">Appearance</span>
+          </div>
+          <div class="flex gap-1 bg-gym-surface rounded-full p-1">
+            <button
+              type="button"
+              (click)="theme.set('light')"
+              class="px-3 py-1.5 text-xs font-semibold rounded-full transition-colors"
+              [class.bg-gym-accent]="theme() === 'light'"
+              [class.text-white]="theme() === 'light'"
+              [class.text-gym-muted]="theme() !== 'light'"
+            >
+              Light
+            </button>
+            <button
+              type="button"
+              (click)="theme.set('dark')"
+              class="px-3 py-1.5 text-xs font-semibold rounded-full transition-colors"
+              [class.bg-gym-accent]="theme() === 'dark'"
+              [class.text-white]="theme() === 'dark'"
+              [class.text-gym-muted]="theme() !== 'dark'"
+            >
+              Dark
+            </button>
+          </div>
+        </div>
+
         <div class="flex items-center justify-between px-5 py-4">
           <div class="flex items-center gap-3">
             <svg class="w-5 h-5 text-gym-muted" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -123,6 +157,9 @@ export class ProfileComponent implements OnInit {
       }
     });
   }
+
+  private themeService = inject(ThemeService);
+  readonly theme = this.themeService.theme;
 
   private calcStreak(dates: string[]): number {
     if (!dates.length) return 0;

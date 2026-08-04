@@ -10,7 +10,7 @@ import { ExerciseDto } from '../../core/models/models';
     template: `
     <div class="px-4 pt-6 pb-8 safe-top">
 
-      <div class="flex items-center gap-3 mb-6">
+      <div class="flex items-center pt-3 pr-1 gap-3 mb-6">
         <button
           type="button"
           (click)="goBack()"
@@ -59,11 +59,11 @@ import { ExerciseDto } from '../../core/models/models';
           <h2 class="text-xl font-bold">{{ ex.name }}</h2>
 
           <div class="flex flex-wrap gap-2 mt-3">
-            <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-gym-accent/15 text-gym-accent">
+            <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-gym-accent/15 text-gym-fg">
               {{ ex.category }}
             </span>
             <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-gym-surface text-gym-muted">
-              {{ ex.equipment }}
+              Equipment : {{ ex.equipment }}
             </span>
           </div>
 

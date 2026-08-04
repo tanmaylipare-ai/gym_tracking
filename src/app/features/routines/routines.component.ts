@@ -13,7 +13,7 @@ import { ExercisePickerComponent } from '../workout/exercise-picker.component';
     <div class="px-4 pt-6 pb-4 safe-top">
 
       <!-- Header -->
-      <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center pt-2 pl-2 justify-between mb-6">
         <h1 class="text-2xl font-bold">Routines</h1>
         <button (click)="openCreate()" class="bg-gym-accent text-white text-sm font-bold px-4 py-2 rounded-xl">
           + New

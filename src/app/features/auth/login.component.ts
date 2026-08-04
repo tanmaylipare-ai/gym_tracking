@@ -9,7 +9,8 @@ import { FooterComponent } from "../../policy/footer/footer.component";
     selector: 'app-login',
     imports: [ReactiveFormsModule, RouterLink, FooterComponent],
     template: `
-    <div class="min-h-screen bg-gym-bg flex flex-col justify-center px-6 safe-top safe-bottom">
+    <!-- If any issue with login page height try changing the h-dvh back to min-h-screen -->
+    <div class=" h-dvh bg-gym-bg flex flex-col justify-center px-6 safe-top safe-bottom"> 
       <div class="flex-1 flex items-center">
       <div class="w-full max-w-md mx-auto">
 
@@ -36,7 +37,7 @@ import { FooterComponent } from "../../policy/footer/footer.component";
             class="input-field"
           />
           @if (form.get('email')?.invalid && form.get('email')?.touched) {
-            <p class="text-gym-accent text-xs mt-1.5">Enter a valid email address.</p>
+            <p class="text-red-500 text-xs mt-1.5">Enter a valid email address.</p>
           }
         </div>
 
@@ -64,17 +65,17 @@ import { FooterComponent } from "../../policy/footer/footer.component";
                 </svg>
               }
             </button>
-            <br><br>
+            <!-- <br><br> -->
           </div>
-          <a routerLink="/forgot-password" class="text-xs text-gym-accent font-medium">Forgot password?</a>          
           @if (form.get('password')?.invalid && form.get('password')?.touched) {
-            <p class="text-gym-accent text-xs mt-1.5">Password is required.</p>
+            <p class="text-red-500 text-xs mt-1.5">Password is required.</p>
           }
+          <a routerLink="/forgot-password" class="text-xs text-gym-accent font-medium">Forgot password?</a>          
         </div>
 
         @if (error()) {
-          <div class="bg-gym-accent/10 border border-gym-accent/30 rounded-xl px-4 py-3">
-            <p class="text-gym-accent text-sm">{{ error() }}</p>
+          <div class="bg-gym border border-red-500 rounded-xl px-4 py-3">
+            <p class="text-red-500 text-sm">{{ error() }}</p>
           </div>
         }
 
@@ -99,7 +100,7 @@ import { FooterComponent } from "../../policy/footer/footer.component";
         <a routerLink="/register" class="text-gym-accent font-medium ml-1">Create one</a>
       </p>
       </div> <!-- max-width container -->
-        </div>
+        </div>  
         <app-footer />
     </div>
   `

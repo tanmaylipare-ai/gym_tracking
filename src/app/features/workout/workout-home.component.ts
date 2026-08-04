@@ -16,7 +16,7 @@ import { TitleCasePipe } from '@angular/common';
 
       <!-- Greeting -->
       <div class="mb-6">
-        <p class="text-gym-muted text-sm">{{ greeting() }}</p>
+        <p class="text-gym-muted pt-1 text-sm">{{ greeting() }}</p>
         <h1 class="text-2xl font-bold mt-0.5">
           {{ (user()?.name ?? 'Athlete') | titlecase }}
         </h1>
@@ -53,7 +53,7 @@ import { TitleCasePipe } from '@angular/common';
               <input
                 [(ngModel)]="workoutName"
                 type="text"
-                placeholder="e.g. Morning Push"
+                placeholder="e.g. Monday Push"
                 class="input-field"
               />
             </div>
