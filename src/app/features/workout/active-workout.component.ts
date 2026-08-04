@@ -5,29 +5,47 @@ import { FormsModule } from '@angular/forms';
 import { WorkoutService } from '../../core/services/workout.service';
 import { WorkoutDto, WorkoutExerciseDto, WorkoutSetDto, ExerciseDto, ExerciseType } from '../../core/models/models';
 import { ExercisePickerComponent } from './exercise-picker.component';
+import {
+  CdkDropList, CdkDrag, CdkDragHandle, CdkDragPlaceholder, CdkDragDrop, moveItemInArray
+} from '@angular/cdk/drag-drop';
 
 const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
 
 @Component({
-    selector: 'app-active-workout',
-    imports: [CommonModule, FormsModule, ExercisePickerComponent],
-    template: `
+  selector: 'app-active-workout',
+  imports: [
+    CommonModule,
+    FormsModule,
+    ExercisePickerComponent,
+    CdkDropList,
+    CdkDrag,
+    CdkDragHandle,
+    CdkDragPlaceholder,
+  ],
+  template: `
     <div class="flex flex-col min-h-screen bg-gym-bg pb-24 safe-top">
-
       <!-- Sticky header -->
-      <div class="sticky top-0 z-30 bg-gym-bg/95 backdrop-blur border-b border-gym-border px-4 pt-4 pb-3">
+      <div
+        class="sticky top-0 z-30 bg-gym-bg/95 backdrop-blur border-b border-gym-border px-4 pt-4 pb-3"
+      >
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-lg font-bold">{{ workout()?.name ?? 'Workout' }}</h1>
+            <h1 class="text-lg font-bold">
+              {{ workout()?.name ?? 'Workout' }}
+            </h1>
             <p class="text-xs text-gym-muted mt-0.5">{{ elapsedStr() }}</p>
           </div>
           <div class="flex gap-2">
-            <button (click)="showCancelConfirm.set(true)"
-                    class="text-gym-muted text-sm px-3 py-1.5 rounded-lg border border-gym-border">
+            <button
+              (click)="showCancelConfirm.set(true)"
+              class="text-gym-muted text-sm px-3 py-1.5 rounded-lg border border-gym-border"
+            >
               Cancel
             </button>
-            <button (click)="confirmFinish()"
-                    class="bg-gym-success text-gym-bg text-sm font-bold px-4 py-1.5 rounded-lg">
+            <button
+              (click)="confirmFinish()"
+              class="bg-gym-success text-gym-bg text-sm font-bold px-4 py-1.5 rounded-lg"
+            >
               Finish
             </button>
           </div>
@@ -35,45 +53,98 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
       </div>
 
       <!-- Body -->
-      <div class="px-4 pt-4 space-y-4">
-
-        @for (ex of workout()?.exercises ?? []; track ex.id; let exIdx = $index) {
-          <div class="card rounded-2xl overflow-hidden">
-
+      <div
+        class="px-4 pt-4 space-y-4 "
+        cdkDropList
+        (cdkDropListDropped)="onExerciseDrop($event)"
+      >
+        @for (
+          ex of workout()?.exercises ?? [];
+          track ex.id;
+          let exIdx = $index
+        ) {
+          <div class="card rounded-2xl overflow-hidden" cdkDrag>
+            <div
+              *cdkDragPlaceholder
+              class="rounded-2xl border-2 border-dashed border-gym-border h-20 mb-4"
+            ></div>
             <!-- Exercise header -->
-            <div class="flex items-center justify-between px-4 py-3 border-b border-gym-border">
-              <div>
-                <p class="font-bold">{{ ex.exerciseName }}</p>
-                <p class="text-xs text-gym-muted mt-0.5">{{ ex.exerciseCategory }}</p>
+            <div
+              class="flex items-center justify-between px-4 py-3 border-b border-gym-border"
+            >
+              <div class="flex items-center gap-2">
+                <span
+                  cdkDragHandle
+                  class="text-gym-muted p-1 -ml-1 cursor-grab active:cursor-grabbing touch-none"
+                  aria-label="Drag to reorder"
+                >
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="8" cy="6" r="1.5" />
+                    <circle cx="8" cy="12" r="1.5" />
+                    <circle cx="8" cy="18" r="1.5" />
+                    <circle cx="16" cy="6" r="1.5" />
+                    <circle cx="16" cy="12" r="1.5" />
+                    <circle cx="16" cy="18" r="1.5" />
+                  </svg>
+                </span>
+                <div>
+                  <p class="font-bold">{{ ex.exerciseName }}</p>
+                  <p class="text-xs text-gym-muted mt-0.5">
+                    {{ ex.exerciseCategory }}
+                  </p>
+                </div>
               </div>
-              <button (click)="removeExercise(exIdx)"
-                      class="text-gym-muted p-1.5">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              <button
+                (click)="removeExercise(exIdx)"
+                class="text-gym-muted p-1.5"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
 
             <!-- Set column headers (per exercise type) -->
-            <div class="grid gap-2 px-4 py-2 text-[10px] font-bold text-gym-muted uppercase tracking-wider"
-                [style.grid-template-columns]="gridTemplateColumns(ex.exerciseType)">
+            <div
+              class="grid gap-2 px-4 py-2 text-[10px] font-bold text-gym-muted uppercase tracking-wider"
+              [style.grid-template-columns]="
+                gridTemplateColumns(ex.exerciseType)
+              "
+            >
               <span class="text-center">SET</span>
               @for (header of columnHeaders(ex.exerciseType); track header) {
-                <span [class.text-center]="header !== 'PREVIOUS'">{{ header }}</span>
+                <span [class.text-center]="header !== 'PREVIOUS'">{{
+                  header
+                }}</span>
               }
               <span></span>
             </div>
 
             <!-- Set rows -->
             @for (set of ex.sets; track set.id; let setIdx = $index) {
-            <div class="grid gap-2 items-center px-4 py-2 transition-colors"
-                [style.grid-template-columns]="gridTemplateColumns(ex.exerciseType)"
-                [class.bg-gym-success/10]="set.isCompleted">
-
+              <div
+                class="grid gap-2 items-center px-4 py-2 transition-colors"
+                [style.grid-template-columns]="
+                  gridTemplateColumns(ex.exerciseType)
+                "
+                [class.bg-gym-success/10]="set.isCompleted"
+              >
                 <!-- Set number -->
-                <span class="text-center text-sm font-bold"
-                      [class.text-gym-success]="set.isCompleted"
-                      [class.text-gym-muted]="!set.isCompleted">
+                <span
+                  class="text-center text-sm font-bold"
+                  [class.text-gym-success]="set.isCompleted"
+                  [class.text-gym-muted]="!set.isCompleted"
+                >
                   {{ set.setNumber }}
                 </span>
 
@@ -81,17 +152,22 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
                 <span class="text-xs text-gym-muted truncate">—</span>
 
                 @switch (ex.exerciseType) {
-
                   @case ('WeightTraining') {
                     <input
-                      type="number" [(ngModel)]="set.weight" (ngModelChange)="onSetChanged(exIdx, setIdx)"
-                      min="0" placeholder="kg"
+                      type="number"
+                      [(ngModel)]="set.weight"
+                      (ngModelChange)="onSetChanged(exIdx, setIdx)"
+                      min="0"
+                      placeholder="kg"
                       class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
                       [class.border-gym-success]="set.isCompleted"
                     />
                     <input
-                      type="number" [(ngModel)]="set.reps" (ngModelChange)="onSetChanged(exIdx, setIdx)"
-                      min="0" placeholder="reps"
+                      type="number"
+                      [(ngModel)]="set.reps"
+                      (ngModelChange)="onSetChanged(exIdx, setIdx)"
+                      min="0"
+                      placeholder="reps"
                       class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
                       [class.border-gym-success]="set.isCompleted"
                     />
@@ -99,8 +175,11 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
 
                   @case ('Bodyweight') {
                     <input
-                      type="number" [(ngModel)]="set.reps" (ngModelChange)="onSetChanged(exIdx, setIdx)"
-                      min="0" placeholder="reps"
+                      type="number"
+                      [(ngModel)]="set.reps"
+                      (ngModelChange)="onSetChanged(exIdx, setIdx)"
+                      min="0"
+                      placeholder="reps"
                       class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
                       [class.border-gym-success]="set.isCompleted"
                     />
@@ -108,15 +187,21 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
 
                   @case ('Cardio') {
                     <input
-                      type="text" inputmode="numeric" [value]="formatDuration(set.durationSeconds)"
+                      type="text"
+                      inputmode="numeric"
+                      [value]="formatDuration(set.durationSeconds)"
                       (change)="onDurationChanged(exIdx, setIdx, $event)"
                       placeholder="mm:ss"
                       class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
                       [class.border-gym-success]="set.isCompleted"
                     />
                     <input
-                      type="number" [(ngModel)]="set.distance" (ngModelChange)="onSetChanged(exIdx, setIdx)"
-                      min="0" step="0.1" placeholder="km"
+                      type="number"
+                      [(ngModel)]="set.distance"
+                      (ngModelChange)="onSetChanged(exIdx, setIdx)"
+                      min="0"
+                      step="0.1"
+                      placeholder="km"
                       class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
                       [class.border-gym-success]="set.isCompleted"
                     />
@@ -124,7 +209,8 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
 
                   @case ('BandTraining') {
                     <select
-                      [(ngModel)]="set.bandLevel" (ngModelChange)="onSetChanged(exIdx, setIdx)"
+                      [(ngModel)]="set.bandLevel"
+                      (ngModelChange)="onSetChanged(exIdx, setIdx)"
                       class="w-full text-center text-xs font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
                       [class.border-gym-success]="set.isCompleted"
                     >
@@ -133,56 +219,91 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
                       }
                     </select>
                     <input
-                      type="number" [(ngModel)]="set.reps" (ngModelChange)="onSetChanged(exIdx, setIdx)"
-                      min="0" placeholder="reps"
+                      type="number"
+                      [(ngModel)]="set.reps"
+                      (ngModelChange)="onSetChanged(exIdx, setIdx)"
+                      min="0"
+                      placeholder="reps"
                       class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
                       [class.border-gym-success]="set.isCompleted"
                     />
                   }
-
                 }
 
                 <!-- Complete toggle -->
-                <button (click)="toggleSetComplete(exIdx, setIdx)"
-                        class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors"
-                        [class.bg-gym-success]="set.isCompleted"
-                        [class.bg-gym-surface]="!set.isCompleted">
-                  <svg class="w-4 h-4" [class.text-gym-bg]="set.isCompleted" [class.text-gym-muted]="!set.isCompleted"
-                       fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                <button
+                  (click)="toggleSetComplete(exIdx, setIdx)"
+                  class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors"
+                  [class.bg-gym-success]="set.isCompleted"
+                  [class.bg-gym-surface]="!set.isCompleted"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    [class.text-gym-bg]="set.isCompleted"
+                    [class.text-gym-muted]="!set.isCompleted"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </button>
 
                 <!-- Delete set -->
-                <button (click)="removeSet(exIdx, setIdx)"
-                        class="flex items-center justify-center w-6 h-6 text-gym-muted"
-                        aria-label="Remove set">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                <button
+                  (click)="removeSet(exIdx, setIdx)"
+                  class="flex items-center justify-center w-6 h-6 text-gym-muted"
+                  aria-label="Remove set"
+                >
+                  <svg
+                    class="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
             }
 
             <!-- Add set button -->
-            <button (click)="addSet(exIdx)"
-                    class="w-full py-3 text-sm font-semibold text-gym-accent border-t border-gym-border transition-opacity active:opacity-60">
+            <button
+              (click)="addSet(exIdx)"
+              class="w-full py-3 text-sm font-semibold text-gym-accent border-t border-gym-border transition-opacity active:opacity-60"
+            >
               + Add Set
             </button>
           </div>
         }
 
         <!-- Add exercise button -->
-        <button (click)="showPicker.set(true)"
-                class="w-full py-4 rounded-2xl border-2 border-dashed border-gym-border text-gym-accent font-semibold text-sm transition-colors active:border-gym-accent/60">
+        <button
+          (click)="showPicker.set(true)"
+          class="w-full py-4 rounded-2xl border-2 border-dashed border-gym-border text-gym-accent font-semibold text-sm transition-colors active:border-gym-accent/60"
+        >
           + Add Exercise
         </button>
-
+        @if (dragError()) {
+          <p class="text-xs text-red-500 text-center">{{ dragError() }}</p>
+        }
       </div>
 
       <!-- Sync indicator -->
       @if (syncing()) {
-        <div class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-gym-surface text-xs text-gym-muted px-3 py-1.5 rounded-full border border-gym-border">
+        <div
+          class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-gym-surface text-xs text-gym-muted px-3 py-1.5 rounded-full border border-gym-border"
+        >
           Syncing…
         </div>
       }
@@ -197,14 +318,28 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
 
       <!-- Cancel confirm modal -->
       @if (showCancelConfirm()) {
-        <div class="fixed inset-0 z-50 bg-black/60 flex items-center px-4 pb-8 safe-bottom" (click)="showCancelConfirm.set(false)">
-          <div class="w-full max-w-md mx-auto card rounded-2xl p-5 space-y-3" (click)="$event.stopPropagation()">
+        <div
+          class="fixed inset-0 z-50 bg-black/60 flex items-center px-4 pb-8 safe-bottom"
+          (click)="showCancelConfirm.set(false)"
+        >
+          <div
+            class="w-full max-w-md mx-auto card rounded-2xl p-5 space-y-3"
+            (click)="$event.stopPropagation()"
+          >
             <h3 class="font-bold text-lg">Cancel workout?</h3>
-            <p class="text-gym-muted text-sm">This workout will be deleted and cannot be recovered.</p>
-            <button (click)="cancelWorkout()" class="w-full bg-gym-accent text-white font-semibold py-3 rounded-xl">
+            <p class="text-gym-muted text-sm">
+              This workout will be deleted and cannot be recovered.
+            </p>
+            <button
+              (click)="cancelWorkout()"
+              class="w-full bg-gym-accent text-white font-semibold py-3 rounded-xl"
+            >
               Yes, cancel workout
             </button>
-            <button (click)="showCancelConfirm.set(false)" class="btn-secondary">
+            <button
+              (click)="showCancelConfirm.set(false)"
+              class="btn-secondary"
+            >
               Keep going
             </button>
           </div>
@@ -213,8 +348,14 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
 
       <!-- Finish confirm modal -->
       @if (showFinishConfirm()) {
-        <div class="fixed inset-0 z-50 bg-black/60 flex items-center px-4 pb-8 safe-bottom" (click)="showFinishConfirm.set(false)">
-          <div class="w-full max-w-md mx-auto card rounded-2xl p-5 space-y-3" (click)="$event.stopPropagation()">
+        <div
+          class="fixed inset-0 z-50 bg-black/60 flex items-center px-4 pb-8 safe-bottom"
+          (click)="showFinishConfirm.set(false)"
+        >
+          <div
+            class="w-full max-w-md mx-auto card rounded-2xl p-5 space-y-3"
+            (click)="$event.stopPropagation()"
+          >
             <h3 class="font-bold text-lg">Finish workout?</h3>
             <p class="text-gym-muted text-sm">
               {{ completedSets() }} of {{ totalSets() }} sets completed.
@@ -225,25 +366,31 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
               rows="2"
               class="input-field resize-none"
             ></textarea>
-            <button (click)="finishWorkout()" class="w-full bg-gym-success text-gym-bg font-bold py-3 rounded-xl">
+            <button
+              (click)="finishWorkout()"
+              class="w-full bg-gym-success text-gym-bg font-bold py-3 rounded-xl"
+            >
               Finish workout
             </button>
-            <button (click)="showFinishConfirm.set(false)" class="btn-secondary">
+            <button
+              (click)="showFinishConfirm.set(false)"
+              class="btn-secondary"
+            >
               Back
             </button>
           </div>
         </div>
       }
     </div>
-  `
+  `,
 })
 export class ActiveWorkoutComponent implements OnInit, OnDestroy {
   private workoutService = inject(WorkoutService);
-  private router         = inject(Router);
+  private router = inject(Router);
 
-  readonly workout           = this.workoutService.activeWorkout;
-  readonly showPicker        = signal(false);
-  readonly syncing           = signal(false);
+  readonly workout = this.workoutService.activeWorkout;
+  readonly showPicker = signal(false);
+  readonly syncing = signal(false);
   readonly showCancelConfirm = signal(false);
   readonly showFinishConfirm = signal(false);
 
@@ -261,18 +408,23 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
     const sec = s % 60;
-    if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-    return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    if (h > 0)
+      return `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
   });
 
   readonly totalSets = computed(() =>
-    (this.workout()?.exercises ?? []).reduce((sum, ex) => sum + ex.sets.length, 0)
+    (this.workout()?.exercises ?? []).reduce(
+      (sum, ex) => sum + ex.sets.length,
+      0,
+    ),
   );
-
+  readonly dragError = signal<string | null>(null);
   readonly completedSets = computed(() =>
-    (this.workout()?.exercises ?? []).reduce((sum, ex) =>
-      sum + ex.sets.filter(s => s.isCompleted).length, 0
-    )
+    (this.workout()?.exercises ?? []).reduce(
+      (sum, ex) => sum + ex.sets.filter((s) => s.isCompleted).length,
+      0,
+    ),
   );
 
   ngOnInit(): void {
@@ -299,20 +451,29 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
 
   gridTemplateColumns(type: ExerciseType): string {
     switch (type) {
-      case 'WeightTraining': return '2rem 1fr 4.5rem 4.5rem 2.5rem 2rem';
-      case 'Bodyweight':     return '2rem 1fr 4.5rem 2.5rem 2rem';
-      case 'Cardio':         return '2rem 1fr 5rem 5rem 2.5rem 2rem';
-      case 'BandTraining':   return '2rem 1fr 5.5rem 4.5rem 2.5rem 2rem';
-      default:               return '2rem 1fr 4.5rem 4.5rem 2.5rem 2rem';
+      case 'WeightTraining':
+        return '2rem 1fr 4.5rem 4.5rem 2.5rem 2rem';
+      case 'Bodyweight':
+        return '2rem 1fr 4.5rem 2.5rem 2rem';
+      case 'Cardio':
+        return '2rem 1fr 5rem 5rem 2.5rem 2rem';
+      case 'BandTraining':
+        return '2rem 1fr 5.5rem 4.5rem 2.5rem 2rem';
+      default:
+        return '2rem 1fr 4.5rem 4.5rem 2.5rem 2rem';
     }
   }
 
   columnHeaders(type: ExerciseType): string[] {
     switch (type) {
-      case 'WeightTraining': return ['PREVIOUS', 'KG', 'REPS'];
-      case 'Bodyweight':     return ['PREVIOUS', 'REPS'];
-      case 'Cardio':         return ['PREVIOUS', 'TIME', 'KM'];
-      case 'BandTraining':   return ['PREVIOUS', 'BAND', 'REPS'];
+      case 'WeightTraining':
+        return ['PREVIOUS', 'KG', 'REPS'];
+      case 'Bodyweight':
+        return ['PREVIOUS', 'REPS'];
+      case 'Cardio':
+        return ['PREVIOUS', 'TIME', 'KM'];
+      case 'BandTraining':
+        return ['PREVIOUS', 'BAND', 'REPS'];
     }
   }
 
@@ -326,7 +487,7 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
   private parseDuration(value: string): number {
     const trimmed = value.trim();
     if (trimmed.includes(':')) {
-      const [m, s] = trimmed.split(':').map(n => parseInt(n, 10) || 0);
+      const [m, s] = trimmed.split(':').map((n) => parseInt(n, 10) || 0);
       return m * 60 + s;
     }
     return parseInt(trimmed, 10) || 0;
@@ -337,7 +498,8 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
     const w = this.workout();
     if (!w) return;
     const updated: WorkoutDto = JSON.parse(JSON.stringify(w));
-    updated.exercises[exIdx].sets[setIdx].durationSeconds = this.parseDuration(value);
+    updated.exercises[exIdx].sets[setIdx].durationSeconds =
+      this.parseDuration(value);
     this.workoutService.updateLocalWorkout(updated);
   }
 
@@ -370,28 +532,43 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
   }
 
   removeSet(exIdx: number, setIdx: number): void {
-  const w = this.workout();
-  if (!w) return;
-  console.log("Remove set triggered Frontend")
-  const updated: WorkoutDto = JSON.parse(JSON.stringify(w));
-  const ex = updated.exercises[exIdx];
+    const w = this.workout();
+    if (!w) return;
+    console.log('Remove set triggered Frontend');
+    const updated: WorkoutDto = JSON.parse(JSON.stringify(w));
+    const ex = updated.exercises[exIdx];
 
-  ex.sets.splice(setIdx, 1);
-  ex.sets.forEach((s, i) => s.setNumber = i + 1);
+    ex.sets.splice(setIdx, 1);
+    ex.sets.forEach((s, i) => (s.setNumber = i + 1));
 
-  this.workoutService.updateLocalWorkout(updated);
-}
+    this.workoutService.updateLocalWorkout(updated);
+  }
 
   removeExercise(exIdx: number): void {
     const w = this.workout();
     if (!w) return;
+    const exercise = w.exercises[exIdx];
+    const previous = w;
+
     const updated: WorkoutDto = JSON.parse(JSON.stringify(w));
     updated.exercises.splice(exIdx, 1);
-    this.workoutService.updateLocalWorkout(updated);
+    this.dragError.set(null);
+    this.workoutService.updateLocalWorkout(updated); // optimistic
+
+    this.workoutService.deleteExercise(exercise.id).subscribe({
+      error: () => {
+        this.dragError.set("Couldn't remove the exercise — please try again.");
+        this.workoutService.updateLocalWorkout(previous);
+      },
+    });
   }
 
   /** Builds a new set for the given exercise type, carrying over the previous set's values as a starting point. */
-  private buildSet(type: ExerciseType, setNumber: number, previous?: WorkoutSetDto): WorkoutSetDto {
+  private buildSet(
+    type: ExerciseType,
+    setNumber: number,
+    previous?: WorkoutSetDto,
+  ): WorkoutSetDto {
     const base: WorkoutSetDto = {
       id: crypto.randomUUID(),
       setNumber,
@@ -407,18 +584,39 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
 
     switch (type) {
       case 'WeightTraining':
-        return { ...base, reps: previous?.reps ?? 8, weight: previous?.weight ?? 0, weightUnit: 'kg' };
+        return {
+          ...base,
+          reps: previous?.reps ?? 8,
+          weight: previous?.weight ?? 0,
+          weightUnit: 'kg',
+        };
       case 'Bodyweight':
         return { ...base, reps: previous?.reps ?? 8 };
       case 'Cardio':
-        return { ...base, durationSeconds: previous?.durationSeconds ?? 60, distance: previous?.distance ?? null, distanceUnit: 'km' };
+        return {
+          ...base,
+          durationSeconds: previous?.durationSeconds ?? 60,
+          distance: previous?.distance ?? null,
+          distanceUnit: 'km',
+        };
       case 'BandTraining':
-        return { ...base, reps: previous?.reps ?? 8, bandLevel: previous?.bandLevel ?? 'Medium' };
+        return {
+          ...base,
+          reps: previous?.reps ?? 8,
+          bandLevel: previous?.bandLevel ?? 'Medium',
+        };
       default:
-        console.warn(`Unknown exercise type "${type}", defaulting to WeightTraining set shape.`);
-        return { ...base, reps: previous?.reps ?? 8, weight: previous?.weight ?? 0, weightUnit: 'kg' };
+        console.warn(
+          `Unknown exercise type "${type}", defaulting to WeightTraining set shape.`,
+        );
+        return {
+          ...base,
+          reps: previous?.reps ?? 8,
+          weight: previous?.weight ?? 0,
+          weightUnit: 'kg',
+        };
     }
-}
+  }
 
   // ── Exercise picker ───────────────────────────────────────────────────────────
 
@@ -432,16 +630,38 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
 
     exercises.forEach((ex, i) => {
       updated.exercises.push({
-        id:               crypto.randomUUID(),
-        exerciseId:       ex.id,
-        exerciseName:     ex.name,
+        id: crypto.randomUUID(),
+        exerciseId: ex.id,
+        exerciseName: ex.name,
         exerciseCategory: ex.category,
-        exerciseType:     ex.exerciseType,
-        order:            nextOrder + i,
-        sets: [this.buildSet(ex.exerciseType, 1)]
+        exerciseType: ex.exerciseType,
+        order: nextOrder + i,
+        sets: [this.buildSet(ex.exerciseType, 1)],
       });
     });
     this.workoutService.updateLocalWorkout(updated);
+  }
+
+  onExerciseDrop(event: CdkDragDrop<WorkoutExerciseDto[]>): void {
+    const w = this.workout();
+    if (!w || event.previousIndex === event.currentIndex) return;
+
+    const previous = w; // snapshot for rollback
+    const updated: WorkoutDto = JSON.parse(JSON.stringify(w));
+    moveItemInArray(updated.exercises, event.previousIndex, event.currentIndex);
+    updated.exercises.forEach((ex, i) => (ex.order = i));
+
+    this.dragError.set(null);
+    this.workoutService.updateLocalWorkout(updated); // optimistic
+
+    this.workoutService
+      .reorderExercises(updated.exercises.map((ex) => ex.id))
+      .subscribe({
+        error: () => {
+          this.dragError.set("Couldn't save the new order — please try again.");
+          this.workoutService.updateLocalWorkout(previous);
+        },
+      });
   }
 
   // ── Finish / cancel ───────────────────────────────────────────────────────────
@@ -455,17 +675,21 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
     if (!w) return;
     this.workoutService.sync(w.id, w).subscribe({
       next: () => {
-        this.workoutService.finish(w.id, this.finishNotes || undefined).subscribe({
-          next: () => this.router.navigate(['/history']),
-          error: () => this.router.navigate(['/history']),
-        });
+        this.workoutService
+          .finish(w.id, this.finishNotes || undefined)
+          .subscribe({
+            next: () => this.router.navigate(['/history']),
+            error: () => this.router.navigate(['/history']),
+          });
       },
       error: () => {
-        this.workoutService.finish(w.id, this.finishNotes || undefined).subscribe({
-          next: () => this.router.navigate(['/history']),
-          error: () => this.router.navigate(['/history']),
-        });
-      }
+        this.workoutService
+          .finish(w.id, this.finishNotes || undefined)
+          .subscribe({
+            next: () => this.router.navigate(['/history']),
+            error: () => this.router.navigate(['/history']),
+          });
+      },
     });
   }
 
