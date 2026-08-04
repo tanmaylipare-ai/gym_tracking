@@ -1,3 +1,4 @@
+import { PrivacyComponent } from './policy/privacy/privacy.component';
 import { Routes } from '@angular/router';
 import { authGuard, noAuthGuard } from './core/guards/auth.guard';
 
@@ -20,6 +21,31 @@ export const routes: Routes = [
   {
     path: 'register',
     loadComponent: () => import('./features/auth/register.component').then(m => m.RegisterComponent),
+    canActivate: [noAuthGuard]
+  },
+  {
+    path: 'privacy',
+    loadComponent: () => import('./policy/privacy/privacy.component').then(m => m.PrivacyComponent),
+    canActivate: [noAuthGuard]
+  },
+  {
+    path: 'terms',
+    loadComponent: () => import('./policy/terms/terms.component').then(m => m.TermsComponent),
+    canActivate: [noAuthGuard]
+  },
+  {
+    path: 'disclaimer',
+    loadComponent: () => import('./policy/disclaimer/disclaimer.component').then(m => m.DisclaimerComponent),
+    canActivate: [noAuthGuard]
+  },
+  {
+    path: 'about',
+    loadComponent: () => import('./policy/about/about.component').then(m => m.AboutComponent),
+    canActivate: [noAuthGuard]
+  },
+  {
+    path: 'contact',
+    loadComponent: () => import('./policy/contact/contact.component').then(m => m.ContactComponent),
     canActivate: [noAuthGuard]
   },
   {

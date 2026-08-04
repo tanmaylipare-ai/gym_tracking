@@ -3,12 +3,14 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
+import { FooterComponent } from "../../policy/footer/footer.component";
 
 @Component({
     selector: 'app-login',
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink, FooterComponent],
     template: `
     <div class="min-h-screen bg-gym-bg flex flex-col justify-center px-6 safe-top safe-bottom">
+      <div class="flex-1 flex items-center">
       <div class="w-full max-w-md mx-auto">
 
       <!-- Logo / brand -->
@@ -97,6 +99,8 @@ import { AuthService } from '../../core/services/auth.service';
         <a routerLink="/register" class="text-gym-accent font-medium ml-1">Create one</a>
       </p>
       </div> <!-- max-width container -->
+        </div>
+        <app-footer />
     </div>
   `
 })

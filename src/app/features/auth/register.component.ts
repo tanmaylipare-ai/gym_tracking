@@ -3,6 +3,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, Validati
 import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
+import { FooterComponent } from "../../policy/footer/footer.component";
 
 function passwordMatch(control: AbstractControl): ValidationErrors | null {
   const pw = control.get('password');
@@ -13,9 +14,10 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
 
 @Component({
     selector: 'app-register',
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink, FooterComponent],
     template: `
     <div class="min-h-screen bg-gym-bg flex flex-col justify-center px-6 safe-top safe-bottom">
+      <div class="flex-1 flex items-center">
       <div class="w-full max-w-md mx-auto">
 
       <!-- Brand -->
@@ -93,6 +95,8 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
         <a routerLink="/login" class="text-gym-accent font-medium ml-1">Sign in</a>
       </p>
       </div> <!-- max-width container -->
+        </div>
+        <app-footer />
     </div>
   `
 })
