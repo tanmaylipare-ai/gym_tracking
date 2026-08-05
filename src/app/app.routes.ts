@@ -48,6 +48,11 @@ export const routes: Routes = [
     loadComponent: () => import('./policy/contact/contact.component').then(m => m.ContactComponent),
     canActivate: [noAuthGuard]
   },
+    {
+    path: 'hero',
+    loadComponent: () => import('./marketing/landing-page/landing-page.component').then(m => m.LandingPageComponent),
+    canActivate: [noAuthGuard]
+  },
   {
     path: '',
     loadComponent: () => import('./shared/components/shell.component').then(m => m.ShellComponent),
