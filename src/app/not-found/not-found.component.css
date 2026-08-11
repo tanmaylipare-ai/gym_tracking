@@ -1,0 +1,41 @@
+.error-page {
+  min-height: calc(100vh - 80px); /* Center vertically on full screen */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.error-content {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Big Glowy 404 Number */
+.error-code {
+  display: block;
+  font-size: clamp(5rem, 15vw, 8rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--primary);
+  text-shadow: 0 0 50px var(--primary-glow);
+  margin-bottom: 16px;
+}
+
+.error-content h1 {
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.error-content p {
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.error-actions {
+  display: flex;
+  justify-content: center;
+}
