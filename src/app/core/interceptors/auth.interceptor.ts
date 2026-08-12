@@ -8,7 +8,6 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
   const storage = inject(StorageService);
   const auth    = inject(AuthService);
 
-  // Skip auth header for auth endpoints themselves
   const isAuthEndpoint = req.url.includes('/api/auth/login')
     || req.url.includes('/api/auth/register')
     || req.url.includes('/api/auth/refresh');
@@ -20,8 +19,21 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
 
   return next(authReq).pipe(
     catchError((err: HttpErrorResponse) => {
+      // ── Handle 429 Too Many Requests ────────────────────────────────────
+      if (err.status === 429) {
+        const retryAfter = err.headers.get('Retry-After');
+        const message = retryAfter 
+          ? `Too many requests! Please wait ${retryAfter} second(s) before trying again.`
+          : 'Too many requests. Please slow down.';
+
+        // Quick native alert popup
+        alert(message);
+
+        return throwError(() => err);
+      }
+
+      // ── Handle 401 Unauthorized ─────────────────────────────────────────
       if (err.status === 401 && !isAuthEndpoint) {
-        // Attempt token refresh then retry
         return auth.refresh().pipe(
           switchMap(res => {
             const retried = req.clone({
@@ -35,6 +47,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
           })
         );
       }
+
       return throwError(() => err);
     })
   );

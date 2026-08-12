@@ -160,9 +160,9 @@ export class WorkoutService {
   }
 
   getActive(): Observable<WorkoutDto> {
-    return this.http.get<WorkoutDto>(`${API}/active`).pipe(
-      tap(w => this.trackServerState(w))
-    );
+    return this.http
+      .get<WorkoutDto>(`${API}/active`)
+      .pipe(tap((w) => this.trackServerState(w)));
   }
 
   // ── Local-only mutators (update signal + storage without HTTP) ─────────────────

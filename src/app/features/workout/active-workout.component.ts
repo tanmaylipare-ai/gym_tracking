@@ -8,6 +8,7 @@ import { ExercisePickerComponent } from './exercise-picker.component';
 import {
   CdkDropList, CdkDrag, CdkDragHandle, CdkDragPlaceholder, CdkDragDrop, moveItemInArray
 } from '@angular/cdk/drag-drop';
+import { catchError, of, switchMap } from 'rxjs';
 
 const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
 
@@ -23,7 +24,17 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
     CdkDragPlaceholder,
   ],
   template: `
-    <div class="flex flex-col min-h-screen bg-gym-bg pb-24 safe-top">
+    <div class="flex flex-col min-h-screen bg-gym-bg pb-24 safe-top relative">
+      <!-- Top Toast Banner for General Errors -->
+      @if (errorMessage() && !showFinishConfirm()) {
+        <div class="fixed top-16 left-4 right-4 z-40 bg-red-500/90 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-lg flex items-center justify-between backdrop-blur animate-fade-in">
+          <span>{{ errorMessage() }}</span>
+          <button (click)="errorMessage.set(null)" class="text-white/80 hover:text-white p-1">
+            ✕
+          </button>
+        </div>
+      }
+
       <!-- Sticky header -->
       <div
         class="sticky top-0 z-30 bg-gym-bg/95 backdrop-blur border-b border-gym-border px-4 pt-4 pb-3"
@@ -54,7 +65,7 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
 
       <!-- Body -->
       <div
-        class="px-4 pt-4 space-y-4 "
+        class="px-4 pt-4 space-y-4"
         cdkDropList
         (cdkDropListDropped)="onExerciseDrop($event)"
       >
@@ -350,31 +361,50 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
       @if (showFinishConfirm()) {
         <div
           class="fixed inset-0 z-50 bg-black/60 flex items-center px-4 pb-8 safe-bottom"
-          (click)="showFinishConfirm.set(false)"
+          (click)="closeFinishConfirm()"
         >
           <div
             class="w-full max-w-md mx-auto card rounded-2xl p-5 space-y-3"
             (click)="$event.stopPropagation()"
           >
             <h3 class="font-bold text-lg">Finish workout?</h3>
+
             <p class="text-gym-muted text-sm">
               {{ completedSets() }} of {{ totalSets() }} sets completed.
             </p>
+
+            <!-- Warning if 0 sets completed -->
+            @if (completedSets() === 0) {
+              <p class="text-xs text-red-500 font-medium bg-red-500/10 p-2.5 rounded-lg border border-red-500/20">
+                ⚠️ You must complete at least 1 set to finish this workout.
+              </p>
+            }
+
+            <!-- Server Error Display -->
+            @if (errorMessage()) {
+              <p class="text-xs text-red-500 font-medium bg-red-500/10 p-2.5 rounded-lg border border-red-500/20">
+                {{ errorMessage() }}
+              </p>
+            }
+
             <textarea
               [(ngModel)]="finishNotes"
               placeholder="Optional notes…"
               rows="2"
               class="input-field resize-none"
             ></textarea>
+
             <button
               (click)="finishWorkout()"
-              class="w-full bg-gym-success text-gym-bg font-bold py-3 rounded-xl"
+              [disabled]="completedSets() === 0"
+              class="w-full bg-gym-success text-gym-bg font-bold py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
             >
               Finish workout
             </button>
+
             <button
-              (click)="showFinishConfirm.set(false)"
-              class="btn-secondary"
+              (click)="closeFinishConfirm()"
+              class="btn-secondary w-full"
             >
               Back
             </button>
@@ -426,6 +456,9 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
       0,
     ),
   );
+
+  // Global error message signal
+  readonly errorMessage = signal<string | null>(null);
 
   ngOnInit(): void {
     if (!this.workout()) {
@@ -534,7 +567,6 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
   removeSet(exIdx: number, setIdx: number): void {
     const w = this.workout();
     if (!w) return;
-    console.log('Remove set triggered Frontend');
     const updated: WorkoutDto = JSON.parse(JSON.stringify(w));
     const ex = updated.exercises[exIdx];
 
@@ -553,7 +585,7 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
     const updated: WorkoutDto = JSON.parse(JSON.stringify(w));
     updated.exercises.splice(exIdx, 1);
     this.dragError.set(null);
-    this.workoutService.updateLocalWorkout(updated); // optimistic
+    this.workoutService.updateLocalWorkout(updated);
 
     this.workoutService.deleteExercise(exercise.id).subscribe({
       error: () => {
@@ -563,7 +595,6 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Builds a new set for the given exercise type, carrying over the previous set's values as a starting point. */
   private buildSet(
     type: ExerciseType,
     setNumber: number,
@@ -606,9 +637,6 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
           bandLevel: previous?.bandLevel ?? 'Medium',
         };
       default:
-        console.warn(
-          `Unknown exercise type "${type}", defaulting to WeightTraining set shape.`,
-        );
         return {
           ...base,
           reps: previous?.reps ?? 8,
@@ -646,13 +674,13 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
     const w = this.workout();
     if (!w || event.previousIndex === event.currentIndex) return;
 
-    const previous = w; // snapshot for rollback
+    const previous = w;
     const updated: WorkoutDto = JSON.parse(JSON.stringify(w));
     moveItemInArray(updated.exercises, event.previousIndex, event.currentIndex);
     updated.exercises.forEach((ex, i) => (ex.order = i));
 
     this.dragError.set(null);
-    this.workoutService.updateLocalWorkout(updated); // optimistic
+    this.workoutService.updateLocalWorkout(updated);
 
     this.workoutService
       .reorderExercises(updated.exercises.map((ex) => ex.id))
@@ -667,30 +695,58 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
   // ── Finish / cancel ───────────────────────────────────────────────────────────
 
   confirmFinish(): void {
+    this.errorMessage.set(null);
     this.showFinishConfirm.set(true);
+  }
+
+  closeFinishConfirm(): void {
+    this.errorMessage.set(null);
+    this.showFinishConfirm.set(false);
   }
 
   finishWorkout(): void {
     const w = this.workout();
     if (!w) return;
-    this.workoutService.sync(w.id, w).subscribe({
-      next: () => {
-        this.workoutService
-          .finish(w.id, this.finishNotes || undefined)
-          .subscribe({
-            next: () => this.router.navigate(['/history']),
-            error: () => this.router.navigate(['/history']),
-          });
-      },
-      error: () => {
-        this.workoutService
-          .finish(w.id, this.finishNotes || undefined)
-          .subscribe({
-            next: () => this.router.navigate(['/history']),
-            error: () => this.router.navigate(['/history']),
-          });
-      },
-    });
+
+    if (this.completedSets() === 0) {
+      this.errorMessage.set('Cannot finish workout without completing at least 1 set.');
+      return;
+    }
+
+    this.errorMessage.set(null);
+
+    this.workoutService
+      .sync(w.id, w)
+      .pipe(
+        catchError((err) => {
+          console.warn('Sync failed, attempting finish anyway...', err);
+          return of(null);
+        }),
+        switchMap(() =>
+          this.workoutService.finish(w.id, this.finishNotes || undefined),
+        ),
+      )
+      .subscribe({
+        next: () => {
+          this.showFinishConfirm.set(false);
+          this.router.navigate(['/history']);
+        },
+        error: (err) => {
+          console.error('Failed to finish workout:', err);
+          
+          // Parse ASP.NET Web API error response types
+          let msg = 'Failed to finish workout. Complete at least 1 set.';
+          if (typeof err?.error === 'string') {
+            msg = err.error;
+          } else if (err?.error?.message) {
+            msg = err.error.message;
+          } else if (err?.error?.title) {
+            msg = err.error.title;
+          }
+
+          this.errorMessage.set(msg);
+        },
+      });
   }
 
   cancelWorkout(): void {

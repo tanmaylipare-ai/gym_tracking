@@ -204,7 +204,7 @@ removeExercise(id: string) {
       exercises:   this.selectedExercises().map((ex, i) => ({
         exerciseId:    ex.id,
         order:         i,
-        defaultSets:   3,
+        defaultSets:   1,
         defaultReps:   8,
         defaultWeight: 0,
         notes:         '',
