@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
 import { FooterComponent } from "../../policy/footer/footer.component";
+import { InputSanitizerService } from '../../core/services/input-sanitizer.service';
 
 function passwordMatch(control: AbstractControl): ValidationErrors | null {
   const pw = control.get('password');
@@ -35,7 +36,7 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
 
         <div>
           <label class="block text-sm font-medium text-gym-muted mb-2">Name</label>
-          <input type="text" formControlName="name" placeholder="Your name"
+          <input type="text" formControlName="name" (blur)="onNameBlur()" placeholder="Your name"
                  autocomplete="name" class="input-field"/>
           @if (form.get('name')?.invalid && form.get('name')?.touched) {
             <p class="text-red-500 text-xs mt-1.5">Name is required.</p>
@@ -44,7 +45,7 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
 
         <div>
           <label class="block text-sm font-medium text-gym-muted mb-2">Email</label>
-          <input type="email" formControlName="email" placeholder="you@example.com"
+          <input type="email" formControlName="email" (blur)="onEmailBlur()" placeholder="you@example.com"
                  autocomplete="email" class="input-field"/>
           @if (form.get('email')?.invalid && form.get('email')?.touched) {
             <p class="text-red-500 text-xs mt-1.5">Enter a valid email address.</p>
@@ -53,10 +54,10 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
 
         <div>
           <label class="block text-sm font-medium text-gym-muted mb-2">Password</label>
-          <input type="password" formControlName="password" placeholder="Min. 8 characters"
+          <input type="password" formControlName="password" placeholder="Min. 8 chars (1 upper, 1 lower, 1 number)"
                  autocomplete="new-password" class="input-field"/>
           @if (form.get('password')?.invalid && form.get('password')?.touched) {
-            <p class="text-red-500 text-xs mt-1.5">Password must be at least 8 characters.</p>
+            <p class="text-red-500 text-xs mt-1.5">Password must be at least 8 characters, containing uppercase, lowercase, and a number.</p>
           }
         </div>
 
@@ -104,24 +105,41 @@ export class RegisterComponent {
   private auth   = inject(AuthService);
   private router = inject(Router);
   private fb     = inject(FormBuilder);
+  private sanitizer = inject(InputSanitizerService);
+
+  private readonly passwordComplexityPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
 
   readonly loading = signal(false);
   readonly error   = signal('');
 
+
   form = this.fb.group({
     name:            ['', Validators.required],
     email:           ['', [Validators.required, Validators.email]],
-    password:        ['', [Validators.required, Validators.minLength(8)]],
+    password:        ['', [Validators.required, Validators.minLength(8), Validators.pattern(this.passwordComplexityPattern)]],
     confirmPassword: ['', Validators.required],
   }, { validators: passwordMatch });
+
+  onNameBlur(): void {
+    const cleanName = this.sanitizer.sanitizeText(this.form.value.name);
+    this.form.patchValue({ name: cleanName }, { emitEvent: false });
+  }
+
+  onEmailBlur(): void {
+    const cleanEmail = this.sanitizer.sanitizeEmail(this.form.value.email);
+    this.form.patchValue({ email: cleanEmail }, { emitEvent: false });
+  }
 
   onSubmit(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading.set(true);
     this.error.set('');
-
-    const { email, password, name } = this.form.value;
-    this.auth.register(email!, password!, name!).subscribe({
+    const cleanName     = this.sanitizer.sanitizeText(this.form.value.name);
+    const cleanEmail    = this.sanitizer.sanitizeEmail(this.form.value.email);
+    const cleanPassword = this.sanitizer.sanitizePassword(this.form.value.password);
+    
+  
+    this.auth.register(cleanEmail, cleanPassword, cleanName).subscribe({
       next: () => this.router.navigate(['/workout']),
       error: (err) => {
         this.error.set(err?.error?.message ?? 'Registration failed. Please try again.');

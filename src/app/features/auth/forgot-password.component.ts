@@ -3,6 +3,7 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
+import { InputSanitizerService } from '../../core/services/input-sanitizer.service';
 
 @Component({
     selector: 'app-forgot-password',
@@ -31,7 +32,7 @@ import { AuthService } from '../../core/services/auth.service';
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gym-muted mb-2">Email</label>
-            <input type="email" formControlName="email" placeholder="you@example.com"
+            <input type="email" formControlName="email" (blur)="onEmailBlur()" placeholder="you@example.com"
                    autocomplete="email" class="input-field"/>
             @if (form.get('email')?.invalid && form.get('email')?.touched) {
               <p class="text-red-500 text-xs mt-1.5">Enter a valid email address.</p>
@@ -71,6 +72,7 @@ import { AuthService } from '../../core/services/auth.service';
 export class ForgotPasswordComponent {
   private auth = inject(AuthService);
   private fb   = inject(FormBuilder);
+  private sanitizer = inject(InputSanitizerService);
 
   readonly loading        = signal(false);
   readonly error          = signal('');
@@ -79,13 +81,20 @@ export class ForgotPasswordComponent {
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
   });
+  
+  onEmailBlur(): void {
+    const cleanEmail = this.sanitizer.sanitizeEmail(this.form.value.email);
+    this.form.patchValue({ email: cleanEmail }, { emitEvent: false });
+  }
 
   onSubmit(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    const cleanEmail = this.sanitizer.sanitizeEmail(this.form.value.email);
+    this.form.patchValue({ email: cleanEmail }, { emitEvent: false });
     this.loading.set(true);
     this.error.set('');
 
-    this.auth.forgotPassword(this.form.value.email!).subscribe({
+    this.auth.forgotPassword(cleanEmail).subscribe({
       next: (res) => {
         this.successMessage.set(res.message);
         this.loading.set(false);

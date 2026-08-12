@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
 import { FooterComponent } from "../../policy/footer/footer.component";
+import { InputSanitizerService } from '../../core/services/input-sanitizer.service';
 
 @Component({
   selector: 'app-login',
@@ -50,6 +51,7 @@ import { FooterComponent } from "../../policy/footer/footer.component";
               <input
                 type="email"
                 formControlName="email"
+                (blur)="onEmailBlur()"
                 placeholder="you@example.com"
                 autocomplete="email"
                 class="input-field"
@@ -182,6 +184,7 @@ export class LoginComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private sanitizer = inject(InputSanitizerService);
 
   readonly showPassword = signal(false);
   readonly loading = signal(false);
@@ -198,16 +201,24 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  onEmailBlur(): void {
+    const cleanEmail = this.sanitizer.sanitizeEmail(this.form.value.email);
+    this.form.patchValue({ email: cleanEmail }, { emitEvent: false });
+  }
+
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+    const cleanEmail = this.sanitizer.sanitizeEmail(this.form.value.email);
+    const cleanPassword = this.sanitizer.sanitizePassword(this.form.value.password);
+    this.form.patchValue({ email: cleanEmail }, { emitEvent: false });
+
     this.loading.set(true);
     this.error.set('');
 
-    const { email, password } = this.form.value;
-    this.auth.login(email!, password!).subscribe({
+    this.auth.login(cleanEmail, cleanPassword).subscribe({
       next: () => this.router.navigate(['/workout']),
       error: (err) => {
         this.error.set(err?.error?.message ?? 'Invalid email or password.');

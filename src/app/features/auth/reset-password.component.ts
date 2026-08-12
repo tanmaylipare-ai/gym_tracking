@@ -3,6 +3,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, Validati
 import { RouterLink, ActivatedRoute } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
+import { InputSanitizerService } from '../../core/services/input-sanitizer.service';
 
 function passwordMatch(control: AbstractControl): ValidationErrors | null {
   const pw  = control.get('newPassword');
@@ -52,10 +53,10 @@ function passwordMatch(control: AbstractControl): ValidationErrors | null {
 
           <div>
             <label class="block text-sm font-medium text-gym-muted mb-2">New password</label>
-            <input type="password" formControlName="newPassword" placeholder="Min. 8 characters"
+            <input type="password" formControlName="newPassword" placeholder="Min. 8 chars (1 upper, 1 lower, 1 number)"
                    autocomplete="new-password" class="input-field"/>
             @if (form.get('newPassword')?.invalid && form.get('newPassword')?.touched) {
-              <p class="text-gym-accent text-xs mt-1.5">Password must be at least 8 characters.</p>
+              <p class="text-red-500 text-xs mt-1.5">Password must be at least 8 characters, containing uppercase, lowercase, and a number.</p>
             }
           </div>
 
@@ -108,6 +109,8 @@ export class ResetPasswordComponent implements OnInit {
   private auth  = inject(AuthService);
   private route = inject(ActivatedRoute);
   private fb    = inject(FormBuilder);
+  private sanitizer = inject(InputSanitizerService);
+  private readonly passwordComplexityPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
 
   // Token is kept only in runtime memory — never written to localStorage/sessionStorage
   token: string | null = null;
@@ -118,7 +121,7 @@ export class ResetPasswordComponent implements OnInit {
   readonly showRequestNewLink = signal(false);
 
   form = this.fb.group({
-    newPassword:     ['', [Validators.required, Validators.minLength(8)]],
+    newPassword:     ['', [Validators.required, Validators.minLength(8),Validators.pattern(this.passwordComplexityPattern)]],
     confirmPassword: ['', Validators.required],
   }, { validators: passwordMatch });
 
@@ -132,7 +135,9 @@ export class ResetPasswordComponent implements OnInit {
     this.error.set('');
     this.showRequestNewLink.set(false);
 
-    this.auth.resetPassword(this.token, this.form.value.newPassword!).subscribe({
+    const cleanPassword = this.sanitizer.sanitizePassword(this.form.value.newPassword!);
+
+    this.auth.resetPassword(this.token, cleanPassword).subscribe({
       next: (res) => {
         this.successMessage.set(res.message);
         this.loading.set(false);
