@@ -9,6 +9,7 @@ import {
   CdkDropList, CdkDrag, CdkDragHandle, CdkDragPlaceholder, CdkDragDrop, moveItemInArray
 } from '@angular/cdk/drag-drop';
 import { catchError, of, switchMap } from 'rxjs';
+import { InputSanitizerService } from '../../core/services/input-sanitizer.service';
 
 const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
 
@@ -417,6 +418,7 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
 export class ActiveWorkoutComponent implements OnInit, OnDestroy {
   private workoutService = inject(WorkoutService);
   private router = inject(Router);
+  private sanitizer      = inject(InputSanitizerService)
 
   readonly workout = this.workoutService.activeWorkout;
   readonly showPicker = signal(false);
@@ -518,12 +520,12 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
   }
 
   private parseDuration(value: string): number {
-    const trimmed = value.trim();
-    if (trimmed.includes(':')) {
-      const [m, s] = trimmed.split(':').map((n) => parseInt(n, 10) || 0);
+    const cleanValue = this.sanitizer.sanitizeText(value).trim();
+    if (cleanValue.includes(':')) {
+      const [m, s] = cleanValue.split(':').map((n) => parseInt(n, 10) || 0);
       return m * 60 + s;
     }
-    return parseInt(trimmed, 10) || 0;
+    return parseInt(cleanValue, 10) || 0;
   }
 
   onDurationChanged(exIdx: number, setIdx: number, event: Event): void {
@@ -715,6 +717,10 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
 
     this.errorMessage.set(null);
 
+    const cleanNotes = this.finishNotes.trim()
+      ? this.sanitizer.sanitizeText(this.finishNotes)
+      : undefined;
+
     this.workoutService
       .sync(w.id, w)
       .pipe(
@@ -723,7 +729,7 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
           return of(null);
         }),
         switchMap(() =>
-          this.workoutService.finish(w.id, this.finishNotes || undefined),
+          this.workoutService.finish(w.id, cleanNotes),
         ),
       )
       .subscribe({

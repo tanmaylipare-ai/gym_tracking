@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ExerciseService } from '../../core/services/exercise.service';
 import { ExerciseDto } from '../../core/models/models';
+import { InputSanitizerService } from '../../core/services/input-sanitizer.service';
 
 interface CategoryFilter {
   label: string;
@@ -10,9 +11,9 @@ interface CategoryFilter {
 }
 
 @Component({
-    selector: 'app-exercise-list',
-    imports: [CommonModule],
-    template: `
+  selector: 'app-exercise-list',
+  imports: [CommonModule],
+  template: `
     <div class="px-4 pt-6 pb-4 safe-top">
       <h1 class="text-2xl p-2 font-bold mb-4">Exercises</h1>
 
@@ -34,9 +35,11 @@ interface CategoryFilter {
             type="button"
             (click)="selectCategory(cat.value)"
             class="shrink-0 text-xs font-semibold px-3.5 py-1.5 rounded-full transition-colors"
-            [ngClass]="activeCategory() === cat.value
-              ? 'bg-gym-accent text-gym-bg'
-              : 'bg-gym-surface text-gym-fg'"
+            [ngClass]="
+              activeCategory() === cat.value
+                ? 'bg-gym-accent text-gym-bg'
+                : 'bg-gym-surface text-gym-fg'
+            "
           >
             {{ cat.label }}
           </button>
@@ -46,8 +49,10 @@ interface CategoryFilter {
       @if (loading()) {
         <!-- Loading skeleton -->
         <div class="space-y-2.5">
-          @for (i of [1,2,3,4,5,6]; track i) {
-            <div class="card rounded-2xl p-2.5 flex items-center gap-3 animate-pulse">
+          @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+            <div
+              class="card rounded-2xl p-2.5 flex items-center gap-3 animate-pulse"
+            >
               <div class="w-16 h-16 shrink-0 rounded-xl bg-gym-surface"></div>
               <div class="flex-1">
                 <div class="h-3.5 bg-gym-surface rounded w-3/4 mb-2"></div>
@@ -59,42 +64,80 @@ interface CategoryFilter {
       } @else if (filteredExercises().length === 0) {
         <!-- Empty state -->
         <div class="text-center py-20">
-          <div class="w-16 h-16 rounded-2xl bg-gym-surface flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-gym-muted" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
+          <div
+            class="w-16 h-16 rounded-2xl bg-gym-surface flex items-center justify-center mx-auto mb-4"
+          >
+            <svg
+              class="w-8 h-8 text-gym-muted"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"
+              />
             </svg>
           </div>
           <p class="font-semibold text-lg">No exercises found</p>
-          <p class="text-gym-muted text-sm mt-1">Try a different search or category.</p>
+          <p class="text-gym-muted text-sm mt-1">
+            Try a different search or category.
+          </p>
         </div>
-        } @else {
+      } @else {
         <!-- List -->
         <div class="space-y-2.5">
           @for (ex of filteredExercises(); track ex.id) {
             <div
               class="card rounded-2xl overflow-hidden cursor-pointer transition-transform active:scale-[0.98] flex items-center gap-3 p-2.5"
-              role="button" tabindex="0"
+              role="button"
+              tabindex="0"
               (click)="openExercise(ex.id)"
               (keydown.enter)="openExercise(ex.id)"
             >
-              <div class="w-16 h-16 shrink-0 rounded-xl bg-gym-surface overflow-hidden">
+              <div
+                class="w-16 h-16 shrink-0 rounded-xl bg-gym-surface overflow-hidden"
+              >
                 @if (thumbnail(ex); as thumb) {
-                  <img [src]="thumb" [alt]="ex.name" loading="lazy" class="w-full h-full object-cover" />
+                  <img
+                    [src]="thumb"
+                    [alt]="ex.name"
+                    loading="lazy"
+                    class="w-full h-full object-cover"
+                  />
                 } @else {
                   <div class="w-full h-full flex items-center justify-center">
-                    <svg class="w-6 h-6 text-gym-muted" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 12h16M4 8v8M8 6v12M16 6v12M20 8v8"/>
+                    <svg
+                      class="w-6 h-6 text-gym-muted"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M4 12h16M4 8v8M8 6v12M16 6v12M20 8v8"
+                      />
                     </svg>
                   </div>
                 }
               </div>
 
               <div class="min-w-0 flex-1">
-                <p class="text-sm text-gym-fg font-semibold truncate">{{ ex.name }}</p>
-                <p class="text-[11px] text-gym-fg mt-0.5">{{ ex.muscleGroup }} · {{ ex.equipment }}</p>
+                <p class="text-sm text-gym-fg font-semibold truncate">
+                  {{ ex.name }}
+                </p>
+                <p class="text-[11px] text-gym-fg mt-0.5">
+                  {{ ex.muscleGroup }} · {{ ex.equipment }}
+                </p>
               </div>
 
-              <span class="text-[10px] font-semibold px-2 py-1 rounded-full bg-gym-accent/15 text-gym-accent shrink-0">
+              <span
+                class="text-[10px] font-semibold px-2 py-1 rounded-full bg-gym-accent/15 text-gym-accent shrink-0"
+              >
                 {{ ex.category }}
               </span>
             </div>
@@ -102,11 +145,12 @@ interface CategoryFilter {
         </div>
       }
     </div>
-  `
+  `,
 })
 export class ExerciseListComponent implements OnInit {
   private exerciseService = inject(ExerciseService);
   private router = inject(Router);
+  private sanitizer = inject(InputSanitizerService);
 
   readonly exercises = signal<ExerciseDto[]>([]);
   readonly loading = signal(true);
@@ -125,15 +169,16 @@ export class ExerciseListComponent implements OnInit {
   readonly filteredExercises = computed(() => {
     const term = this.search().trim().toLowerCase();
     const cat = this.activeCategory();
-    return this.exercises().filter(e =>
-      (!cat || e.category === cat) &&
-      (!term || e.name.toLowerCase().includes(term))
+    return this.exercises().filter(
+      (e) =>
+        (!cat || e.category === cat) &&
+        (!term || e.name.toLowerCase().includes(term)),
     );
   });
 
   ngOnInit(): void {
     this.exerciseService.getAll().subscribe({
-      next: list => {
+      next: (list) => {
         this.exercises.set(list);
         this.loading.set(false);
       },
@@ -142,7 +187,9 @@ export class ExerciseListComponent implements OnInit {
   }
 
   onSearch(event: Event): void {
-    this.search.set((event.target as HTMLInputElement).value);
+    const rawValue = (event.target as HTMLInputElement).value;
+    const cleanValue = this.sanitizer.sanitizeText(rawValue);
+    this.search.set(cleanValue);
   }
 
   selectCategory(value: string | null): void {

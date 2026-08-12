@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExerciseService } from '../../core/services/exercise.service';
 import { ExerciseDto } from '../../core/models/models';
+import { InputSanitizerService } from '../../core/services/input-sanitizer.service';
 
 @Component({
     selector: 'app-exercise-picker',
@@ -35,7 +36,7 @@ import { ExerciseDto } from '../../core/models/models';
           </svg>
             <input
               [ngModel]="searchQuery()"
-              (ngModelChange)="searchQuery.set($event)"
+              (ngModelChange)="onSearchChange($event)"
               type="text"
               placeholder="Search exercises…"
               class="input-field pl-10"
@@ -110,6 +111,7 @@ import { ExerciseDto } from '../../core/models/models';
 })
 export class ExercisePickerComponent implements OnInit {
   private exerciseService = inject(ExerciseService);
+  private sanitizer       = inject(InputSanitizerService);
 
   close    = output<void>();
   selected$ = output<ExerciseDto[]>();
@@ -142,6 +144,10 @@ export class ExercisePickerComponent implements OnInit {
       next: (list) => { this.exercises.set(list); this.loading.set(false); },
       error: ()     => this.loading.set(false)
     });
+  }
+  onSearchChange(value: string): void {
+    const cleanQuery = this.sanitizer.sanitizeText(value);
+    this.searchQuery.set(cleanQuery);
   }
 
   toggleSelect(ex: ExerciseDto): void {

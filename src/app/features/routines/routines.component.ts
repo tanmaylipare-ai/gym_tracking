@@ -5,6 +5,7 @@ import { RoutineService, CreateRoutinePayload } from '../../core/services/routin
 import { ExerciseService } from '../../core/services/exercise.service';
 import { RoutineDto, ExerciseDto } from '../../core/models/models';
 import { ExercisePickerComponent } from '../workout/exercise-picker.component';
+import { InputSanitizerService } from '../../core/services/input-sanitizer.service';
 
 @Component({
     selector: 'app-routines',
@@ -155,6 +156,7 @@ import { ExercisePickerComponent } from '../workout/exercise-picker.component';
 })
 export class RoutinesComponent implements OnInit {
   private routineService  = inject(RoutineService);
+  private sanitizer      = inject(InputSanitizerService);
 
   readonly routines         = signal<RoutineDto[]>([]);
   readonly loading          = signal(true);
@@ -194,13 +196,18 @@ removeExercise(id: string) {
 }
 
   createRoutine(): void {
-    if (!this.newName.trim()) return;
+    const cleanName = this.sanitizer.sanitizeText(this.newName);
+    const cleanDescription = this.newDescription.trim() 
+      ? this.sanitizer.sanitizeText(this.newDescription) 
+      : undefined;
+
+    if (!cleanName) return;
     this.creating.set(true);
     this.createError.set('');
 
     const payload: CreateRoutinePayload = {
-      name:        this.newName.trim(),
-      description: this.newDescription.trim() || undefined,
+      name:        cleanName,
+      description: cleanDescription,
       exercises:   this.selectedExercises().map((ex, i) => ({
         exerciseId:    ex.id,
         order:         i,

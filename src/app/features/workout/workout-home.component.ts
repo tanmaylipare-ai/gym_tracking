@@ -7,6 +7,7 @@ import { RoutineService } from '../../core/services/routine.service';
 import { AuthService } from '../../core/services/auth.service';
 import { RoutineDto } from '../../core/models/models';
 import { TitleCasePipe } from '@angular/common';
+import { InputSanitizerService } from '../../core/services/input-sanitizer.service';
 
 @Component({
     selector: 'app-workout-home',
@@ -132,6 +133,7 @@ export class WorkoutHomeComponent implements OnInit {
   private routineService = inject(RoutineService);
   private authService    = inject(AuthService);
   private router         = inject(Router);
+  private sanitizer      = inject(InputSanitizerService);
 
   readonly activeWorkout  = this.workoutService.activeWorkout;
   readonly user           = this.authService.user;
@@ -165,7 +167,8 @@ export class WorkoutHomeComponent implements OnInit {
   }
 
   startEmptyWorkout(): void {
-    const name = this.workoutName.trim() || 'Workout';
+    const cleanName = this.sanitizer.sanitizeText(this.workoutName)
+    const name = cleanName.trim() || 'Workout';
     this.starting.set(true);
     this.error.set('');
     this.workoutService.start(name).subscribe({
