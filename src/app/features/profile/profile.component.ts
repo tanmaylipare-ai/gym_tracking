@@ -1,12 +1,13 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { WorkoutService } from '../../core/services/workout.service';
 import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
     selector: 'app-profile',
-    imports: [CommonModule, DatePipe],
+    imports: [CommonModule, DatePipe, RouterLink],
     template: `
     <div class="px-4 pt-6 pb-8 safe-top">
 
@@ -49,6 +50,22 @@ import { ThemeService } from '../../core/services/theme.service';
           </div>
         </div>
       </div>
+
+      <!-- Analytics link -->
+      <a
+        routerLink="/analytics"
+        class="w-full card rounded-2xl px-5 py-4 mb-4 flex items-center justify-between"
+      >
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-gym-muted" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2"/>
+          </svg>
+          <span class="text-sm font-medium">Analytics</span>
+        </div>
+        <svg class="w-4 h-4 text-gym-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
 
       <!-- Settings rows -->
       <div class="card rounded-2xl mb-4 divide-y divide-gym-border">

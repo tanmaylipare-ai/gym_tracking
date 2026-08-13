@@ -12,16 +12,6 @@ export interface AuthResponse {
   user: UserProfileDto;
 }
 
-// export interface ExerciseDto {
-//   id: string;
-//   name: string;
-//   category: string;
-//   muscleGroup: string;
-//   description?: string;
-//   isCustom: boolean;
-//   createdAt: string;
-// }
-
 export type ExerciseType = 'WeightTraining' | 'Bodyweight' | 'Cardio' | 'BandTraining';
 
 export interface ExerciseDto {
@@ -33,7 +23,7 @@ export interface ExerciseDto {
   equipment: string;
   description: string | null;
   isCustom: boolean;
-  exerciseType: ExerciseType;  
+  exerciseType: ExerciseType;
   createdAt: string;
   thumbnailUrl: string | null;
   videoUrl: string | null;
@@ -66,6 +56,7 @@ export interface WorkoutSetDto {
   reps: number | null;
   weight: number | null;
   weightUnit: string | null;
+  isWarmup: boolean;
   durationSeconds: number | null;
   distance: number | null;
   distanceUnit: string | null;
@@ -143,6 +134,7 @@ export interface SyncSetDto {
   reps: number | null;
   weight: number | null;
   weightUnit: string | null;
+  isWarmup: boolean;
   durationSeconds: number | null;
   distance: number | null;
   distanceUnit: string | null;
@@ -157,4 +149,53 @@ export interface SyncExerciseDto {
   order: number;
   notes: string | null;
   sets: SyncSetDto[];
+}
+
+// ── Analytics response shapes (must match backend AnalyticsDtos.cs exactly) ────
+// DateOnly serializes as "YYYY-MM-DD".
+
+export interface WeightTrainingPointDto {
+  date: string;
+  topSetWeightKg: number;
+  topSetReps: number;
+  e1RM: number;
+  heaviestSetKg: number;
+  averageWorkingWeightKg: number | null;
+}
+
+export interface TonnageEfficiencyPointDto {
+  date: string;
+  totalTonnageKg: number;
+  sessionMinutes: number;
+  tonnagePerMinute: number;
+}
+
+export interface BodyweightPointDto {
+  date: string;
+  totalSets: number;
+  totalReps: number;
+  volume: number;
+  maxRepsInSingleSet: number;
+}
+
+export interface CardioPointDto {
+  date: string;
+  durationSeconds: number;
+  distanceKm: number | null;
+  paceSecPerKm: number | null;
+  strokesOrStrides: number | null;
+  ratePerMin: number | null;
+}
+
+export interface SessionCompositionPointDto {
+  weekStart: string;
+  cardioMinutes: number;
+  strengthMinutes: number;
+  cardioRatioPercent: number;
+}
+
+export interface BandVolumePointDto {
+  date: string;
+  virtualVolumeKg: number;
+  weightTrainingVolumeKg: number;
 }

@@ -98,6 +98,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/history/workout-detail.component').then(m => m.WorkoutDetailComponent) // 😴 Lazy
       },
       {
+        path: 'analytics',
+        loadComponent: () => import('./features/dashboard/analytics-dashboard.component').then(m => m.AnalyticsDashboardComponent) // 😴 Lazy
+      },
+      {
         path: 'profile',
         loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent) // 😴 Lazy
       }

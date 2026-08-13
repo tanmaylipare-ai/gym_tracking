@@ -183,6 +183,21 @@ const BAND_LEVELS = ['Light', 'Medium', 'Heavy', 'X-Heavy'];
                       class="w-full text-center text-sm font-semibold bg-gym-surface rounded-lg py-2 border border-gym-border focus:outline-none focus:border-gym-accent"
                       [class.border-gym-success]="set.isCompleted"
                     />
+                    <!-- Warm-up toggle — excludes this set from Average Working
+                         Weight analytics. Only meaningful for WeightTraining. -->
+                    <button
+                      (click)="toggleSetWarmup(exIdx, setIdx)"
+                      class="flex items-center justify-center w-8 h-8 mx-auto rounded-lg text-[10px] font-bold transition-colors"
+                      [class.bg-amber-500]="set.isWarmup"
+                      [class.text-gym-bg]="set.isWarmup"
+                      [class.bg-gym-surface]="!set.isWarmup"
+                      [class.text-gym-muted]="!set.isWarmup"
+                      [attr.aria-pressed]="set.isWarmup"
+                      aria-label="Mark as warm-up set"
+                      title="Warm-up set"
+                    >
+                      W
+                    </button>
                   }
 
                   @case ('Bodyweight') {
@@ -487,7 +502,8 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
   gridTemplateColumns(type: ExerciseType): string {
     switch (type) {
       case 'WeightTraining':
-        return '2rem 1fr 4.5rem 4.5rem 2.5rem 2rem';
+        // SET, PREVIOUS, KG, REPS, WARMUP, COMPLETE, DELETE
+        return '2rem 1fr 4.5rem 4.5rem 2.5rem 2.5rem 2rem';
       case 'Bodyweight':
         return '2rem 1fr 4.5rem 2.5rem 2rem';
       case 'Cardio':
@@ -555,6 +571,15 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
     this.workoutService.updateLocalWorkout(updated);
   }
 
+  toggleSetWarmup(exIdx: number, setIdx: number): void {
+    const w = this.workout();
+    if (!w) return;
+    const updated: WorkoutDto = JSON.parse(JSON.stringify(w));
+    const set = updated.exercises[exIdx].sets[setIdx];
+    set.isWarmup = !set.isWarmup;
+    this.workoutService.updateLocalWorkout(updated);
+  }
+
   addSet(exIdx: number): void {
     const w = this.workout();
     if (!w) return;
@@ -608,6 +633,9 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
       reps: null,
       weight: null,
       weightUnit: null,
+      // New sets always start as working sets — warm-up status isn't carried
+      // over from the previous set, it's a per-set choice made in the UI.
+      isWarmup: false,
       durationSeconds: null,
       distance: null,
       distanceUnit: null,
@@ -739,7 +767,7 @@ export class ActiveWorkoutComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Failed to finish workout:', err);
-          
+
           // Parse ASP.NET Web API error response types
           let msg = 'Failed to finish workout. Complete at least 1 set.';
           if (typeof err?.error === 'string') {
