@@ -52,7 +52,7 @@ import { ThemeService } from '../../core/services/theme.service';
       </div>
 
       <!-- Analytics link -->
-      <a
+      <!-- <a
         routerLink="/analytics"
         class="w-full card rounded-2xl px-5 py-4 mb-4 flex items-center justify-between"
       >
@@ -65,7 +65,7 @@ import { ThemeService } from '../../core/services/theme.service';
         <svg class="w-4 h-4 text-gym-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
         </svg>
-      </a>
+      </a> -->
 
       <!-- Settings rows -->
       <div class="card rounded-2xl mb-4 divide-y divide-gym-border">

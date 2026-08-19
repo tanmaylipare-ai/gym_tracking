@@ -109,13 +109,12 @@ import { ChartConfiguration } from 'chart.js';
             @case ('WeightTraining') {
               <app-chart-card
                 title="Estimated 1-Rep Max"
-                subtitle="Epley formula, top set per session"
                 type="line"
                 [data]="e1rmChartData()"
                 [options]="lineOptions"
                 [loading]="loadingAnalytics()"
               />
-              <app-chart-card
+              <app-chart-card class = "p-2"
                 title="Heaviest Set vs Average Working Weight"
                 type="line"
                 [data]="heaviestVsAwwChartData()"
@@ -132,7 +131,7 @@ import { ChartConfiguration } from 'chart.js';
                 [options]="lineOptions"
                 [loading]="loadingAnalytics()"
               />
-              <app-chart-card
+              <app-chart-card class = "p-2"
                 title="Max-Rep Set Ceiling"
                 subtitle="highest unbroken rep count per session"
                 type="line"
